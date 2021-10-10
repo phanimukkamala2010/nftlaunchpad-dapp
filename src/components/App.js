@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import './App.css';
 import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
+import MatchFCC from '../abis/MatchFCC.json';
 
 class App extends Component {
 
@@ -10,6 +11,7 @@ class App extends Component {
         await this.loadWeb3();
         await this.loadBlockchainData();
         await this.getBalance();
+        await this.getPlayers();
     }
 
     async componentWillUnmount()    {
@@ -36,12 +38,12 @@ class App extends Component {
         this.setState({account: accounts[0]});
 
         const networkId = await window.web3.eth.net.getId();
-        const networkData = FantasyCricketCoin.networks[networkId];
-        //console.log(networkId);
-        if(networkData) {
-            const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, networkData.address);
-            this.setState({fcc});
-        }
+
+        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, FantasyCricketCoin.networks[networkId].address);
+        this.setState({fcc});
+
+        const match = await window.web3.eth.Contract(MatchFCC.abi, MatchFCC.networks[networkId].address);
+        this.setState({match});
     }
 
     async callMint()    {
@@ -51,9 +53,30 @@ class App extends Component {
 
     async getBalance()  {
         //console.log("In getBalance");
-        const account = this.state.account;
         const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
         this.setState({balance: bal.toString()});
+    }
+
+    async getPlayers()  {
+        console.log("In getPlayers");
+        for(var i = 0; i < 5; ++i)
+        {
+            const playerName = await this.state.match.methods.getPlayer(i).call(); 
+            console.log("player=" + playerName);
+            this.setState({ players: this.state.players.concat({name: playerName, cost: 20, points: "NA"}) });
+        }
+    }
+
+    renderPlayerTable()  {
+        return this.state.players.map((player, index) => {
+            return (
+                   <tr key={index}>
+                    <td>{player.name}</td>
+                    <td>{player.cost}</td>
+                    <td>{player.points}</td>
+                   </tr>
+                   );
+        });
     }
 
     constructor(props) {
@@ -61,9 +84,10 @@ class App extends Component {
         this.state = {
             account: '',
             balance: 0,
+            players: []
         };
         this.callMint = this.callMint.bind(this);
-        this.interval = setInterval(() => this.getBalance(), 5000);
+        this.interval = setInterval(() => this.getBalance(), 10000);
     }
 
   render() {
@@ -87,6 +111,19 @@ class App extends Component {
             <span className="navbar-text text-white"> ({this.state.balance} FCC) </span>
         </div>
       </nav>
+      <div><h3>Oct 2021,  Match - India vs NZ</h3></div>
+      <table className="table" >
+        <thead>
+            <tr width="20%">
+                <th scope="col" width="20%">PLAYER</th>
+                <th scope="col" width="20%">COST</th>
+                <th scope="col" >POINTS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {this.renderPlayerTable()}
+        </tbody>
+      </table>
       </div>
     );
   }
