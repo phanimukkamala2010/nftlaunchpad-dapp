@@ -6,35 +6,34 @@ import "./PlayerFCC.sol";
 
 contract MatchFCC is PlayerFCC {
 
-    mapping (address => bytes32[]) private _address2Players;
+    mapping (address => uint256[]) private _address2Players;
     
-    function addMatchPlayers(string memory name1, 
-                             string memory name2,
-                             string memory name3,
-                             string memory name4,
-                             string memory name5,
-                             string memory name6,
-                             string memory name7,
-                             string memory name8,
-                             string memory name9, 
-                             string memory name10,
-                             string memory name11) external {
-        addMatchPlayer(stringToBytes32(name1));
-        addMatchPlayer(stringToBytes32(name2));
-        addMatchPlayer(stringToBytes32(name3));
-        addMatchPlayer(stringToBytes32(name4));
-        addMatchPlayer(stringToBytes32(name5));
-        addMatchPlayer(stringToBytes32(name6));
-        addMatchPlayer(stringToBytes32(name7));
-        addMatchPlayer(stringToBytes32(name8));
-        addMatchPlayer(stringToBytes32(name9));
-        addMatchPlayer(stringToBytes32(name10));
-        addMatchPlayer(stringToBytes32(name11));
+    function addMatchPlayers(uint256 index1, 
+                             uint256 index2,
+                             uint256 index3,
+                             uint256 index4,
+                             uint256 index5,
+                             uint256 index6,
+                             uint256 index7,
+                             uint256 index8,
+                             uint256 index9, 
+                             uint256 index10,
+                             uint256 index11) external {
+        addMatchPlayer(index1);
+        addMatchPlayer(index2);
+        addMatchPlayer(index3);
+        addMatchPlayer(index4);
+        addMatchPlayer(index5);
+        addMatchPlayer(index6);
+        addMatchPlayer(index7);
+        addMatchPlayer(index8);
+        addMatchPlayer(index9);
+        addMatchPlayer(index10);
+        addMatchPlayer(index11);
     }
 
-    function addMatchPlayer(bytes32 name) private {
-        validPlayer(name);
-        _address2Players[msg.sender].push(name);
+    function addMatchPlayer(uint256 index) private {
+        _address2Players[msg.sender].push(index);
     }
 
     function getMatchPoints() external view returns (uint256) {

@@ -48,7 +48,13 @@ class App extends Component {
 
     async callMint()    {
         //console.log("In callMint");
-        await this.state.fcc.methods.mintCoin().send({from: this.state.account}).then(this.getBalance());
+        await this.state.fcc.methods.mintCoin().send({from: this.state.account});
+    }
+
+    async callPlay()    {
+        const owner = await this.state.fcc.methods.owner().call();
+        console.log("In callPlay " + owner);
+        await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
     }
 
     async getBalance()  {
@@ -58,12 +64,16 @@ class App extends Component {
     }
 
     async getPlayers()  {
-        console.log("In getPlayers");
-        for(var i = 0; i < 5; ++i)
+        //console.log("In getPlayers");
+        const playerCount = await this.state.match.methods.getPlayerCount().call();
+        this.setState({playerCount});
+
+        for(var i = 0; i < playerCount; ++i)
         {
             const playerName = await this.state.match.methods.getPlayer(i).call(); 
-            console.log("player=" + playerName);
-            this.setState({ players: this.state.players.concat({name: playerName, cost: 20, points: "NA"}) });
+            const playerCost = await this.state.match.methods.getCost(i).call();
+            //console.log("player=" + playerName + "," + playerCost);
+            this.setState({ players: this.state.players.concat({name: playerName, cost: playerCost.toString(), points: "NA"}) });
         }
     }
 
@@ -71,6 +81,7 @@ class App extends Component {
         return this.state.players.map((player, index) => {
             return (
                    <tr key={index}>
+                    <td>{index + 1}</td>
                     <td>{player.name}</td>
                     <td>{player.cost}</td>
                     <td>{player.points}</td>
@@ -84,9 +95,11 @@ class App extends Component {
         this.state = {
             account: '',
             balance: 0,
+            playerCount: 0,
             players: []
         };
         this.callMint = this.callMint.bind(this);
+        this.callPlay = this.callPlay.bind(this);
         this.interval = setInterval(() => this.getBalance(), 10000);
     }
 
@@ -111,19 +124,34 @@ class App extends Component {
             <span className="navbar-text text-white"> ({this.state.balance} FCC) </span>
         </div>
       </nav>
-      <div><h3>Oct 2021,  Match - India vs NZ</h3></div>
-      <table className="table" >
+      <div id="titleStyle" ><h3>10/Oct/2021,  Match - India vs NZ</h3></div>
+      <table className="table" id="playersTable">
         <thead>
             <tr width="20%">
-                <th scope="col" width="20%">PLAYER</th>
-                <th scope="col" width="20%">COST</th>
+                <th scope="col" >ID</th>
+                <th scope="col" >PLAYER</th>
+                <th scope="col" >COST</th>
                 <th scope="col" >POINTS</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody className="playersStyle" >
             {this.renderPlayerTable()}
         </tbody>
       </table>
+      <table className="table" id="playersTable">
+        <thead>
+            <tr width="20%">
+                <th scope="col" >ID</th>
+                <th scope="col" >PLAYER</th>
+                <th scope="col" >COST</th>
+                <th scope="col" >POINTS</th>
+            </tr>
+        </thead>
+        <tbody className="playersStyle" >
+            {this.renderPlayerTable()}
+        </tbody>
+      </table>
+      <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
       </div>
     );
   }

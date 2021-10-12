@@ -11,70 +11,63 @@ contract PlayerFCC {
         stringToBytes32("MSDhoni"),
         stringToBytes32("HardikPandya"),
         stringToBytes32("GlennMaxwell"),
+        stringToBytes32("ABD"),
+        stringToBytes32("Padikkal"),
+        stringToBytes32("Chahal"),
         stringToBytes32("SteveSmith")
     ];
-    mapping (bytes32 => uint256) private _player2Cost;
-    mapping (bytes32 => uint256) private _player2Points;
+
+    uint256[] private _costs = [
+        20,
+        10,
+        15,
+        12,
+        7,
+        13,
+        14,
+        15
+    ];
+
+    uint256[] private _points = [
+        0,
+        0
+    ];
 
     constructor() {
-        _player2Cost[_players[0]] = 20;
-        _player2Cost[_players[1]] = 10;
-        _player2Cost[_players[2]] = 15;
-        _player2Cost[_players[3]] = 12;
-        _player2Cost[_players[4]] = 7;
     }
 
-    function validPlayer(bytes32 name) internal view {
+    function getPlayerIndex(bytes32 name) internal view returns (uint256) {
         uint256 count = _players.length;
-        uint256 valid = 0;
+        uint256 index = 999;
         for(uint256 i = 0; i < count; ++i)
         {
-            valid = (name == _players[i]) ? 1 : 0;
-            if(valid == 1) {
+            if(name == _players[i]) {
+                index = i;
                 break;
             }
         }
-        require(valid == 1, "not a valid player");
+        require(index != 999, "not a valid player");
+        return index;
+    }
+
+    function getPlayerCount() external view returns (uint256)   {
+        return _players.length;
     }
 
     function getPlayer(uint256 index) external view returns(string memory) {
         return string(abi.encodePacked(_players[index]));
     }
     
-    function addPlayer(string memory name) external {
-        uint256 count = _players.length;
-        for(uint256 i = 0; i < count; ++i)
-        {
-            require(stringToBytes32(name) != _players[i], "player already exists");
-        }
-        _players.push(stringToBytes32(name));
+    function setPoints(uint256 playerIndex, uint256 val) external {
+        _points[playerIndex] = val;
     }
 
-    function setPoints(string memory name, uint256 val) external {
-        _player2Points[stringToBytes32(name)] = val;
+    function getCost(uint256 playerIndex) public view returns (uint256) {
+        return _costs[playerIndex];
     }
 
-    function setCost(string memory name, uint256 val) external {
-        _player2Cost[stringToBytes32(name)] = val;
-    }
-
-    function getCost(bytes32 name) internal view returns (uint256) {
-        validPlayer(name);
-        return _player2Cost[name];
-    }
-
-    function getPoints(bytes32 name) internal view returns (uint256) {
-        validPlayer(name);
-        return _player2Points[name];
-    }
-
-    function getPoints() internal view returns (string memory) {
-        string memory s = "";
-        uint256 num = _players.length;
-        for(uint256 i = 0; i < num; ++i) {
-            s = string(abi.encodePacked(s, " ", _players[i], "(", toString(_player2Cost[_players[i]]), ",", toString(_player2Points[_players[i]]),"),"));
-        }
-        return s;
+    function getPoints(uint256 playerIndex) internal view returns (uint256) {
+        return _points[playerIndex];
     }
 
     function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
