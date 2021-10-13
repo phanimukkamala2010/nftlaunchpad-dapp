@@ -36,6 +36,10 @@ contract PlayerFCC {
     constructor() {
     }
 
+    function getPlayerIndex(string memory name) public view returns (uint256) {
+        return getPlayerIndex(stringToBytes32(name));
+    }
+
     function getPlayerIndex(bytes32 name) internal view returns (uint256) {
         uint256 count = _players.length;
         uint256 index = 999;

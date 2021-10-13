@@ -24,12 +24,6 @@ class App extends Component {
                 window.web3 = new Web3(window.ethereum);
                 await window.ethereum.enable();
             }
-            else if (window.web3) {
-                window.web3 = new Web3(window.web3.currentProvider);
-            }
-            else {
-                console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-            }
         });
     }
 
@@ -57,10 +51,32 @@ class App extends Component {
         await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
     }
 
+    async callConfirmPlayers()    {
+        
+        const player1 = await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0]).call();
+        const owner = await this.state.match.methods.addMatchPlayers(
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1,
+            player1
+            ).send({from: this.state.account});
+        console.log("In callPlay " + owner);
+        await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
+    }
+
     async getBalance()  {
         //console.log("In getBalance");
         const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
-        this.setState({balance: bal.toString()});
+        if(bal) {
+                this.setState({balance: bal.toString()});
+        }
     }
 
     async getPlayers()  {
@@ -77,6 +93,19 @@ class App extends Component {
         }
     }
 
+    async onChange(event, id)  {
+        console.log("called onChange " + id.index + " " + JSON.stringify(id) + " " + event.target.checked + " " + event.target.id);
+        const checked = event.target.checked;
+        const playerName = await this.state.match.methods.getPlayer(event.target.id).call(); 
+        
+        this.setState({ selectedPlayers: this.state.selectedPlayers.filter( function(name) {
+            return name != playerName;
+        }) });
+        if(checked)    {
+            this.setState({ selectedPlayers: this.state.selectedPlayers.concat(playerName) });
+        }
+    }
+
     renderPlayerTable()  {
         return this.state.players.map((player, index) => {
             return (
@@ -85,6 +114,21 @@ class App extends Component {
                     <td>{player.name}</td>
                     <td>{player.cost}</td>
                     <td>{player.points}</td>
+                    <td>
+                     <div className="form-check">
+                     <input className="form-check-input" type="checkbox" value="" id={index} onChange={(event)=> this.onChange(event, {index})}/>
+                     </div>
+                    </td>
+                   </tr>
+                   );
+        });
+    }
+    renderSelectedPlayerTable()  {
+        return this.state.selectedPlayers.map((player, index) => {
+            return (
+                   <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{player}</td>
                    </tr>
                    );
         });
@@ -96,10 +140,13 @@ class App extends Component {
             account: '',
             balance: 0,
             playerCount: 0,
-            players: []
+            players: [],
+            selectedPlayers: []
         };
         this.callMint = this.callMint.bind(this);
         this.callPlay = this.callPlay.bind(this);
+        this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.interval = setInterval(() => this.getBalance(), 10000);
     }
 
@@ -132,6 +179,7 @@ class App extends Component {
                 <th scope="col" >PLAYER</th>
                 <th scope="col" >COST</th>
                 <th scope="col" >POINTS</th>
+                <th scope="col" >SELECT</th>
             </tr>
         </thead>
         <tbody className="playersStyle" >
@@ -142,16 +190,27 @@ class App extends Component {
         <thead>
             <tr width="20%">
                 <th scope="col" >ID</th>
-                <th scope="col" >PLAYER</th>
+                <th scope="col" >SELECTED PLAYER</th>
                 <th scope="col" >COST</th>
                 <th scope="col" >POINTS</th>
             </tr>
         </thead>
         <tbody className="playersStyle" >
-            {this.renderPlayerTable()}
+            {this.renderSelectedPlayerTable()}
         </tbody>
       </table>
-      <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
+      <table className="table" id="buttonTable">
+        <tbody>
+         <tr>
+          <td>
+           <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
+          </td>
+          <td>
+           <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
+          </td>
+         </tr>
+        </tbody>
+      </table>
       </div>
     );
   }

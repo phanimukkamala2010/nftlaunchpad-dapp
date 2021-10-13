@@ -13,6 +13,15 @@
   padding: 4px;
 }
 
+#buttonTable {
+  text-align: center;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 40%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 #playersTable {
   text-align: center;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
