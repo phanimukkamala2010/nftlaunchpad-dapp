@@ -46,29 +46,30 @@ class App extends Component {
     }
 
     async callPlay()    {
+        const playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
+        const cost = await this.state.match.methods.getMatchCost().call({from: this.state.account});
         const owner = await this.state.fcc.methods.owner().call();
-        console.log("In callPlay " + owner);
+        console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
         await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
     }
 
     async callConfirmPlayers()    {
-        
-        const player1 = await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0]).call();
-        const owner = await this.state.match.methods.addMatchPlayers(
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1,
-            player1
-            ).send({from: this.state.account});
-        console.log("In callPlay " + owner);
-        await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
+        var playerstr = 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[1]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[2]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[3]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[4]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[5]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[6]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[7]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[8]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[9]).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[10]).call() + ";";
+        //console.log(playerstr);
+        await this.state.match.methods.addMatchPlayers(playerstr).send({from: this.state.account});
+
+        //console.log("In callPlay " + "-" + playerstr);
     }
 
     async getBalance()  {
@@ -94,7 +95,7 @@ class App extends Component {
     }
 
     async onChange(event, id)  {
-        console.log("called onChange " + id.index + " " + JSON.stringify(id) + " " + event.target.checked + " " + event.target.id);
+        //console.log("called onChange " + id.index + " " + JSON.stringify(id) + " " + event.target.checked + " " + event.target.id);
         const checked = event.target.checked;
         const playerName = await this.state.match.methods.getPlayer(event.target.id).call(); 
         

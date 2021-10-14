@@ -6,31 +6,79 @@ import "./FCC.sol";
 
 contract PlayerFCC {
 
-    bytes32[] private _players = [
-        stringToBytes32("ViratKohli"),
-        stringToBytes32("MSDhoni"),
-        stringToBytes32("HardikPandya"),
-        stringToBytes32("GlennMaxwell"),
-        stringToBytes32("ABD"),
-        stringToBytes32("Padikkal"),
-        stringToBytes32("Chahal"),
-        stringToBytes32("SteveSmith")
+    bytes32[22] private _players = [
+        /* 00 */ stringToBytes32("ViratKohli"),
+        /* 01 */ stringToBytes32("MSDhoni"),
+        /* 02 */ stringToBytes32("HardikPandya"),
+        /* 03 */ stringToBytes32("GlennMaxwell"),
+        /* 04 */ stringToBytes32("ABD"),
+        /* 05 */ stringToBytes32("Padikkal"),
+        /* 06 */ stringToBytes32("Chahal"),
+        /* 07 */ stringToBytes32("Tripathi"),
+        /* 08 */ stringToBytes32("ShubmanGill"),
+        /* 09 */ stringToBytes32("PrithviShaw"),
+        /* 10 */ stringToBytes32("Warner"),
+        /* 11 */ stringToBytes32("RohitSharma"),
+        /* 12 */ stringToBytes32("Pollard"),
+        /* 13 */ stringToBytes32("Bravo"),
+        /* 14 */ stringToBytes32("Hetmeyer"),
+        /* 15 */ stringToBytes32("ShreyasIyer"),
+        /* 16 */ stringToBytes32("Pant"),
+        /* 17 */ stringToBytes32("Ishan"),
+        /* 18 */ stringToBytes32("Suryakumar"),
+        /* 19 */ stringToBytes32("ShardulThakur"),
+        /* 20 */ stringToBytes32("DeepakChahar"),
+        /* 21 */ stringToBytes32("SteveSmith")
     ];
 
-    uint256[] private _costs = [
-        20,
-        10,
-        15,
-        12,
-        7,
-        13,
-        14,
-        15
+    uint256[22] private _costs = [
+        /* 00 */ 10,
+        /* 01 */ 20,
+        /* 02 */ 21,
+        /* 03 */ 22,
+        /* 04 */ 10,
+        /* 05 */ 7,
+        /* 06 */ 8,
+        /* 07 */ 9,
+        /* 08 */ 10,
+        /* 09 */ 8,
+        /* 10 */ 18,
+        /* 11 */ 8,
+        /* 12 */ 8,
+        /* 13 */ 12,
+        /* 14 */ 8,
+        /* 15 */ 8,
+        /* 16 */ 13,
+        /* 17 */ 8,
+        /* 18 */ 8,
+        /* 19 */ 8,
+        /* 20 */ 8,
+        /* 21 */ 8
     ];
 
-    uint256[] private _points = [
-        0,
-        0
+    uint256[22] private _points = [
+        /* 00 */ 0,
+        /* 01 */ 0,
+        /* 02 */ 0,
+        /* 03 */ 0,
+        /* 04 */ 0,
+        /* 05 */ 0,
+        /* 06 */ 0,
+        /* 07 */ 0,
+        /* 08 */ 0,
+        /* 09 */ 0,
+        /* 10 */ 0,
+        /* 11 */ 0,
+        /* 12 */ 0,
+        /* 13 */ 0,
+        /* 14 */ 0,
+        /* 15 */ 0,
+        /* 16 */ 0,
+        /* 17 */ 0,
+        /* 18 */ 0,
+        /* 19 */ 0,
+        /* 20 */ 0,
+        /* 21 */ 0
     ];
 
     constructor() {

@@ -6,54 +6,63 @@ import "./PlayerFCC.sol";
 
 contract MatchFCC is PlayerFCC {
 
-    mapping (address => uint256[]) private _address2Players;
-    
-    function addMatchPlayers(uint256 index1, 
-                             uint256 index2,
-                             uint256 index3,
-                             uint256 index4,
-                             uint256 index5,
-                             uint256 index6,
-                             uint256 index7,
-                             uint256 index8,
-                             uint256 index9, 
-                             uint256 index10,
-                             uint256 index11) external {
-        addMatchPlayer(index1);
-        addMatchPlayer(index2);
-        addMatchPlayer(index3);
-        addMatchPlayer(index4);
-        addMatchPlayer(index5);
-        addMatchPlayer(index6);
-        addMatchPlayer(index7);
-        addMatchPlayer(index8);
-        addMatchPlayer(index9);
-        addMatchPlayer(index10);
-        addMatchPlayer(index11);
+    mapping (address => bytes32) private _address2Players;
+
+    function addMatchPlayers(string memory val) external    {
+        _address2Players[msg.sender] = stringToBytes32(val);
     }
 
-    function addMatchPlayer(uint256 index) private {
-        _address2Players[msg.sender].push(index);
+    function getMatchPlayers() external view returns (string memory) {
+        return string(abi.encodePacked(_address2Players[msg.sender]));
     }
 
     function getMatchPoints() external view returns (uint256) {
         return getMatchPoints(msg.sender);
     }
 
+    function getMatchCost() external view returns (uint256) {
+        return getMatchCost(msg.sender);
+    }
+
+    function getMatchPlayersArray(address val) public view returns (uint256[11] memory) {
+        bytes32 playerStr = _address2Players[val];
+        uint256[11] memory result;
+        uint256 currentIndex = 0;
+        uint256 currentPos = 0;
+        for(uint256 i = 0; i < playerStr.length; ++i)
+        {
+            uint8 c = uint8(playerStr[i]);
+            if (c >= 48 && c <= 57) {
+                currentIndex = currentIndex * 10 + (c - 48);
+            }        
+            else if(c == 59) {
+                result[currentPos] = currentIndex;
+                break;
+            }
+            else if(c == 58) {
+                result[currentPos++] = currentIndex;
+                currentIndex = 0;
+            }
+        }
+        return result;
+    }
+
     function getMatchCost(address val) public view returns (uint256) {
+        uint256[11] memory players = getMatchPlayersArray(val);
         uint256 totalCost = 0;
         for(uint256 i = 0; i < 11; ++i)
         {
-            totalCost += super.getCost(_address2Players[val][i]);
+            totalCost += super.getCost(players[i]);
         }
         return totalCost;
     }
 
     function getMatchPoints(address val) public view returns (uint256) {
+        uint256[11] memory players = getMatchPlayersArray(val);
         uint256 totalScore = 0;
         for(uint256 i = 0; i < 11; ++i)
         {
-            totalScore += super.getPoints(_address2Players[val][i]);
+            totalScore += super.getPoints(players[i]);
         }
         return totalScore;
     }
