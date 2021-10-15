@@ -118,7 +118,7 @@ contract PlayerFCC {
         return _costs[playerIndex];
     }
 
-    function getPoints(uint256 playerIndex) internal view returns (uint256) {
+    function getPoints(uint256 playerIndex) public view returns (uint256) {
         return _points[playerIndex];
     }
 

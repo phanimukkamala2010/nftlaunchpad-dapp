@@ -43,6 +43,7 @@ class App extends Component {
     async callMint()    {
         //console.log("In callMint");
         await this.state.fcc.methods.mintCoin().send({from: this.state.account});
+        this.getBalance();
     }
 
     async callPlay()    {
@@ -89,26 +90,47 @@ class App extends Component {
         {
             const playerName = await this.state.match.methods.getPlayer(i).call(); 
             const playerCost = await this.state.match.methods.getCost(i).call();
+            const playerPoints = await this.state.match.methods.getPoints(i).call();
             //console.log("player=" + playerName + "," + playerCost);
-            this.setState({ players: this.state.players.concat({name: playerName, cost: playerCost.toString(), points: "NA"}) });
+            this.setState({ players: this.state.players.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
         }
     }
 
-    async onChange(event, id)  {
+    async getSelectedPlayersTotal() {
+        var cost = 0;
+        var points = 0;
+        for(var i = 0; i < 22; ++i) {
+            if(this.state.checkedPlayers[i]) {
+                cost += parseInt(await this.state.match.methods.getCost(i).call());
+                points += parseInt(await this.state.match.methods.getPoints(i).call());
+            }
+        }
+        this.setState({selectedPlayersCost: cost});
+        this.setState({selectedPlayersPoints: points});
+    }
+
+    async onChange(event)  {
         //console.log("called onChange " + id.index + " " + JSON.stringify(id) + " " + event.target.checked + " " + event.target.id);
         const checked = event.target.checked;
-        const playerName = await this.state.match.methods.getPlayer(event.target.id).call(); 
+        const index = event.target.id;
+        this.state.checkedPlayers[event.target.id] = checked;
+        const playerName = await this.state.match.methods.getPlayer(index).call(); 
+        const playerCost = await this.state.match.methods.getCost(index).call();
+        const playerPoints = await this.state.match.methods.getPoints(index).call();
         
-        this.setState({ selectedPlayers: this.state.selectedPlayers.filter( function(name) {
-            return name != playerName;
+        this.setState({ selectedPlayers: this.state.selectedPlayers.filter( function(_player) {
+            return _player.name != playerName;
         }) });
-        if(checked)    {
-            this.setState({ selectedPlayers: this.state.selectedPlayers.concat(playerName) });
+        if(checked) {
+            this.setState({ selectedPlayers: this.state.selectedPlayers.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
         }
+        this.getSelectedPlayersTotal();
     }
 
     renderPlayerTable()  {
+        const count = this.state.selectedPlayers.length;
         return this.state.players.map((player, index) => {
+            const checked = this.state.checkedPlayers[index];
             return (
                    <tr key={index}>
                     <td>{index + 1}</td>
@@ -117,7 +139,7 @@ class App extends Component {
                     <td>{player.points}</td>
                     <td>
                      <div className="form-check">
-                     <input className="form-check-input" type="checkbox" value="" id={index} onChange={(event)=> this.onChange(event, {index})}/>
+                      <input className="form-check-input" disabled={count >= 11 && !checked} type="checkbox" id={index} onChange={(event)=> this.onChange(event)}/>
                      </div>
                     </td>
                    </tr>
@@ -129,7 +151,9 @@ class App extends Component {
             return (
                    <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{player}</td>
+                    <td>{player.name}</td>
+                    <td>{player.cost}</td>
+                    <td>{player.points}</td>
                    </tr>
                    );
         });
@@ -142,11 +166,15 @@ class App extends Component {
             balance: 0,
             playerCount: 0,
             players: [],
-            selectedPlayers: []
+            selectedPlayers: [],
+            selectedPlayersCost: 0,
+            selectedPlayersPoints: 0,
+            checkedPlayers: []
         };
         this.callMint = this.callMint.bind(this);
         this.callPlay = this.callPlay.bind(this);
         this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
+        this.getSelectedPlayersTotal = this.getSelectedPlayersTotal.bind(this);
         this.onChange = this.onChange.bind(this);
         this.interval = setInterval(() => this.getBalance(), 10000);
     }
@@ -177,7 +205,7 @@ class App extends Component {
         <thead>
             <tr width="20%">
                 <th scope="col" >ID</th>
-                <th scope="col" >PLAYER</th>
+                <th scope="col" >PLAYERS AVAILABLE</th>
                 <th scope="col" >COST</th>
                 <th scope="col" >POINTS</th>
                 <th scope="col" >SELECT</th>
@@ -191,13 +219,19 @@ class App extends Component {
         <thead>
             <tr width="20%">
                 <th scope="col" >ID</th>
-                <th scope="col" >SELECTED PLAYER</th>
+                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
                 <th scope="col" >COST</th>
                 <th scope="col" >POINTS</th>
             </tr>
         </thead>
         <tbody className="playersStyle" >
             {this.renderSelectedPlayerTable()}
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td>{this.state.selectedPlayersCost}</td>
+                <td>{this.state.selectedPlayersPoints}</td>
+            </tr>
         </tbody>
       </table>
       <table className="table" id="buttonTable">
