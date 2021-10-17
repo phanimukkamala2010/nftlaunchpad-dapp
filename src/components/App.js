@@ -10,7 +10,6 @@ class App extends Component {
     async componentWillMount()  {
         await this.loadWeb3();
         await this.loadBlockchainData();
-        await this.getBalance();
         await this.getPlayers();
     }
 
@@ -43,42 +42,73 @@ class App extends Component {
     async callMint()    {
         //console.log("In callMint");
         await this.state.fcc.methods.mintCoin().send({from: this.state.account});
-        this.getBalance();
     }
 
     async callPlay()    {
         const playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
         const cost = await this.state.match.methods.getMatchCost().call({from: this.state.account});
         const owner = await this.state.fcc.methods.owner().call();
-        console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
-        await this.state.fcc.methods.transfer(owner, 2).send({from: this.state.account});
+        const blockNumber = await this.state.match.methods.getBlockNumber().call();
+        const account = this.state.account;
+        //console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
+        var paid = 0;
+        this.state.fcc.getPastEvents('Transfer', { fromBlock: blockNumber }).then(function(events) { 
+            for(var i = 0; i < events.length; ++i) {
+                if(events[i].returnValues.from.toLowerCase() == account.toLowerCase() && 
+                   events[i].returnValues.to.toLowerCase() == owner.toLowerCase()) {
+                    paid += parseInt(events[i].returnValues.value);
+                    //console.log("filtered " + events[i].returnValues.from + "=>" + events[i].returnValues.to + " " + events[i].returnValues.value + "," + paid);
+                }
+            }
+            //console.log("totalPaid=" + paid);
+        });
+        await this.state.fcc.methods.transfer(owner, 1).send({from: this.state.account});
     }
 
     async callConfirmPlayers()    {
         var playerstr = 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[1]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[2]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[3]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[4]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[5]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[6]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[7]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[8]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[9]).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[10]).call() + ";";
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[1].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[2].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[3].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[4].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[5].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[6].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[7].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[8].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[9].name).call() + ":" + 
+                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[10].name).call() + ";";
         //console.log(playerstr);
-        await this.state.match.methods.addMatchPlayers(playerstr).send({from: this.state.account});
+        const owner = await this.state.fcc.methods.owner().call();
+        this.state.match.methods.addMatchPlayers(playerstr).send({from: this.state.account}).on('transactionHash', function(hash) {
+            //console.log("hash-" + hash);
+        });
 
         //console.log("In callPlay " + "-" + playerstr);
     }
 
-    async getBalance()  {
-        //console.log("In getBalance");
+    async runTimer()  {
+        //console.log("In runTimer");
         const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
         if(bal) {
                 this.setState({balance: bal.toString()});
         }
+
+        const owner = await this.state.fcc.methods.owner().call();
+        const blockNumber = await this.state.match.methods.getBlockNumber().call();
+        const account = this.state.account;
+        var paid = 0;
+        await this.state.fcc.getPastEvents('Transfer', { fromBlock: blockNumber }).then(function(events) { 
+            for(var i = 0; i < events.length; ++i) {
+                if(events[i].returnValues.from.toLowerCase() == account.toLowerCase() && 
+                   events[i].returnValues.to.toLowerCase() == owner.toLowerCase()) {
+                    paid += parseInt(events[i].returnValues.value);
+                    //console.log("filtered " + events[i].returnValues.from + "=>" + events[i].returnValues.to + " " + events[i].returnValues.value + "," + paid);
+                }
+            }
+        });
+        this.setState({fccPaid: paid});
+        //console.log("fccPaid=" + this.state.fccPaid);
     }
 
     async getPlayers()  {
@@ -164,6 +194,7 @@ class App extends Component {
         this.state = {
             account: '',
             balance: 0,
+            fccPaid: 0,
             playerCount: 0,
             players: [],
             selectedPlayers: [],
@@ -176,7 +207,7 @@ class App extends Component {
         this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
         this.getSelectedPlayersTotal = this.getSelectedPlayersTotal.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.interval = setInterval(() => this.getBalance(), 10000);
+        this.interval = setInterval(() => this.runTimer(), 10000);
     }
 
   render() {
@@ -238,7 +269,7 @@ class App extends Component {
         <tbody>
          <tr>
           <td>
-           <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
+           <button type="submit" disabled={this.state.selectedPlayers.length != 11} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
           </td>
           <td>
            <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>

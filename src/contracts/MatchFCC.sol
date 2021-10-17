@@ -7,7 +7,19 @@ import "./PlayerFCC.sol";
 contract MatchFCC is PlayerFCC {
 
     mapping (address => bytes32) private _address2Players;
+    uint256 private _blockNumber;
 
+    constructor() {
+        _blockNumber = block.number;
+    }
+
+    function getBlockNumber() external view returns (uint256) {
+        return _blockNumber;
+    }
+
+    function addMatchPlayers(address addFrom, string memory val) external    {
+        _address2Players[addFrom] = stringToBytes32(val);
+    }
     function addMatchPlayers(string memory val) external    {
         _address2Players[msg.sender] = stringToBytes32(val);
     }
