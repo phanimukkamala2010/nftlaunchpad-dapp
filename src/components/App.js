@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
 import Web3 from 'web3';
 import './App.css';
 import logo from './fcc.png'
@@ -11,6 +12,8 @@ class App extends Component {
         await this.loadWeb3();
         await this.loadBlockchainData();
         await this.getPlayers();
+        await this.runTimer();
+        await this.getPreviousSelectedPlayers();
     }
 
     async componentWillUnmount()    {
@@ -45,23 +48,8 @@ class App extends Component {
     }
 
     async callPlay()    {
-        const playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
-        const cost = await this.state.match.methods.getMatchCost().call({from: this.state.account});
         const owner = await this.state.fcc.methods.owner().call();
-        const blockNumber = await this.state.match.methods.getBlockNumber().call();
-        const account = this.state.account;
         //console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
-        var paid = 0;
-        this.state.fcc.getPastEvents('Transfer', { fromBlock: blockNumber }).then(function(events) { 
-            for(var i = 0; i < events.length; ++i) {
-                if(events[i].returnValues.from.toLowerCase() == account.toLowerCase() && 
-                   events[i].returnValues.to.toLowerCase() == owner.toLowerCase()) {
-                    paid += parseInt(events[i].returnValues.value);
-                    //console.log("filtered " + events[i].returnValues.from + "=>" + events[i].returnValues.to + " " + events[i].returnValues.value + "," + paid);
-                }
-            }
-            //console.log("totalPaid=" + paid);
-        });
         await this.state.fcc.methods.transfer(owner, 1).send({from: this.state.account});
     }
 
@@ -79,7 +67,6 @@ class App extends Component {
                 await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[9].name).call() + ":" + 
                 await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[10].name).call() + ";";
         //console.log(playerstr);
-        const owner = await this.state.fcc.methods.owner().call();
         this.state.match.methods.addMatchPlayers(playerstr).send({from: this.state.account}).on('transactionHash', function(hash) {
             //console.log("hash-" + hash);
         });
@@ -89,11 +76,18 @@ class App extends Component {
 
     async runTimer()  {
         //console.log("In runTimer");
+        await this.getBalance();
+        await this.getFccPaid();
+    }
+
+    async getBalance() {
         const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
         if(bal) {
                 this.setState({balance: bal.toString()});
         }
+    }
 
+    async getFccPaid() {
         const owner = await this.state.fcc.methods.owner().call();
         const blockNumber = await this.state.match.methods.getBlockNumber().call();
         const account = this.state.account;
@@ -137,6 +131,28 @@ class App extends Component {
         }
         this.setState({selectedPlayersCost: cost});
         this.setState({selectedPlayersPoints: points});
+    }
+
+    async getPreviousSelectedPlayers()  {
+        var playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
+        if(playerStr != null && !playerStr.includes(':')) {
+            return;
+        }
+        playerStr = playerStr.replace(';', ':');
+        const playerArray = playerStr.split(":");
+        var cost = 0;
+        var points = 0;
+        for(var i = 0; i < 11; ++i) {
+            //console.log(playerArray[i]);
+            const playerName = await this.state.match.methods.getPlayer(playerArray[i]).call(); 
+            const playerCost = await this.state.match.methods.getCost(playerArray[i]).call();
+            cost += parseInt(playerCost.toString());
+            const playerPoints = await this.state.match.methods.getPoints(playerArray[i]).call();
+            points += parseInt(playerPoints.toString());
+            this.setState({ previousSelectedPlayers: this.state.previousSelectedPlayers.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
+        }
+        this.setState({previousSelectedPlayersCost: cost});
+        this.setState({previousSelectedPlayersPoints: points});
     }
 
     async onChange(event)  {
@@ -188,6 +204,18 @@ class App extends Component {
                    );
         });
     }
+    renderPreviousSelectedPlayerTable()  {
+        return this.state.previousSelectedPlayers.map((player, index) => {
+            return (
+                   <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{player.name}</td>
+                    <td>{player.cost}</td>
+                    <td>{player.points}</td>
+                   </tr>
+                   );
+        });
+    }
 
     constructor(props) {
         super(props);
@@ -200,6 +228,9 @@ class App extends Component {
             selectedPlayers: [],
             selectedPlayersCost: 0,
             selectedPlayersPoints: 0,
+            previousSelectedPlayers: [],
+            previousSelectedPlayersCost: 0,
+            previousSelectedPlayersPoints: 0,
             checkedPlayers: []
         };
         this.callMint = this.callMint.bind(this);
@@ -213,25 +244,24 @@ class App extends Component {
   render() {
     return (
       <div>
-      <nav className="navbar navbar-expand-lg navbar-light bg-primary">
-        <img src={logo} width="120" height="60" className="align-top" alt="" />
-        <a className="navbar-brand text-white" href="#">FCC-Cricket</a>
+      <nav className="navbar navbar-expand-lg navbar-light bg-primary" >
         <div className="collapse navbar-collapse" id="navbarText">
             <ul className="navbar-nav mr-auto">
-                <li className="nav-item">
+                <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>FCC-Cricket</a> </li>
+                <li id="menuStyle" > <Link className="text-white" to="/Results">Results</Link> </li>
+                <li className="nav-item" >
                 { this.state.balance == 0 ?
-                    (<a className="nav-link text-white" href="javascript:void(0)" onClick={(event) => this.callMint()} >Mint</a>)
+                    (<a className="text-white" id="menuStyle" href="javascript:void(0)" onClick={(event) => this.callMint()} >Mint</a>)
                     :
-                    (<a className="nav-link text-white disabled" href="javascript:void(0)" onClick={(event) => this.callMint()} >Mint</a>)
+                    (<span />)
                 }
                 </li>
                 
             </ul>
-            <span className="navbar-text text-white"> {this.state.account} </span>
-            <span className="navbar-text text-white"> ({this.state.balance} FCC) </span>
+            <span className="text-white" id="menuStyle" > {this.state.account} ({this.state.balance} FCC) </span>
         </div>
       </nav>
-      <div id="titleStyle" ><h3>10/Oct/2021,  Match - India vs NZ</h3></div>
+      <div id="titleStyle" ><h4>10/Oct/2021,  Match - India vs NZ</h4></div>
       <table className="table" id="playersTable">
         <thead>
             <tr width="20%">
@@ -272,11 +302,33 @@ class App extends Component {
            <button type="submit" disabled={this.state.selectedPlayers.length != 11} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
           </td>
           <td>
-           <button type="submit" id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
+           <button type="submit" disabled={this.state.fccPaid != 0} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
           </td>
          </tr>
         </tbody>
       </table>
+      <div id="titleStyle" ><h3>Previous Selection</h3></div>
+      <table className="table" id="playersTable">
+        <thead>
+            <tr width="20%">
+                <th scope="col" >ID</th>
+                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
+                <th scope="col" >COST</th>
+                <th scope="col" >POINTS</th>
+            </tr>
+        </thead>
+        <tbody className="playersStyle" >
+            {this.renderPreviousSelectedPlayerTable()}
+            <tr>
+                <td>Total</td>
+                <td></td>
+                <td>{this.state.previousSelectedPlayersCost}</td>
+                <td>{this.state.previousSelectedPlayersPoints}</td>
+            </tr>
+        </tbody>
+      </table>
+      <div className="App-intro">
+      </div>
       </div>
     );
   }

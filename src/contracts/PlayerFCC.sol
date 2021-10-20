@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "./FCC.sol";
-
 contract PlayerFCC {
 
     bytes32[22] private _players = [
