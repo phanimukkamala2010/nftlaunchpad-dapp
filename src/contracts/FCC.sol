@@ -14,7 +14,7 @@ contract FantasyCricketCoin is ERC20 {
     function mintCoin() external {
         require(super.totalSupply() < MAX_CURRENT_SUPPLY, "cannot mint anymore coins");
         require(super.balanceOf(_msgSender()) == 0, "address cannot mint anymore coins");
-        _mint(_msgSender(), 11);
+        _mint(_msgSender(), 100);
     }
 
     function ownerMintCoin(uint256 amount) external onlyOwner {

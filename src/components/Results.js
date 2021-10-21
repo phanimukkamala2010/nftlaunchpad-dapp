@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
+import { Route, Switch, Link } from 'react-router-dom';
 import Web3 from 'web3';
 import './App.css';
 import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
 import MatchFCC from '../abis/MatchFCC.json';
 
-class App extends Component {
+class Results extends Component {
 
     async componentWillMount()  {
         await this.loadWeb3();
@@ -29,6 +29,11 @@ class App extends Component {
         });
     }
 
+    async callMint()    {
+        //console.log("In callMint");
+        await this.state.fcc.methods.mintCoin().send({from: this.state.account});
+    }
+
     async loadBlockchainData()  {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
@@ -40,17 +45,6 @@ class App extends Component {
 
         const match = await window.web3.eth.Contract(MatchFCC.abi, MatchFCC.networks[networkId].address);
         this.setState({match});
-    }
-
-    async callMint()    {
-        //console.log("In callMint");
-        await this.state.fcc.methods.mintCoin().send({from: this.state.account});
-    }
-
-    async callPlay()    {
-        const owner = await this.state.fcc.methods.owner().call();
-        //console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
-        await this.state.fcc.methods.transfer(owner, 1).send({from: this.state.account});
     }
 
     async callConfirmPlayers()    {
@@ -234,7 +228,6 @@ class App extends Component {
             checkedPlayers: []
         };
         this.callMint = this.callMint.bind(this);
-        this.callPlay = this.callPlay.bind(this);
         this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
         this.getSelectedPlayersTotal = this.getSelectedPlayersTotal.bind(this);
         this.onChange = this.onChange.bind(this);
@@ -247,8 +240,9 @@ class App extends Component {
       <nav className="navbar navbar-expand-lg navbar-light bg-primary" >
         <div className="collapse navbar-collapse" id="navbarText">
             <ul className="navbar-nav mr-auto">
-                <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>FCC-Cricket</a> </li>
-                <li id="menuStyle" > <Link className="text-white" to="/Results">Results</Link> </li>
+                <li id="menuStyle" > <a className="text-white" href="/" >FCC-Cricket</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/Results">Results</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/About">About</a> </li>
                 <li className="nav-item" >
                 { this.state.balance == 0 ?
                     (<a className="text-white" id="menuStyle" href="javascript:void(0)" onClick={(event) => this.callMint()} >Mint</a>)
@@ -262,76 +256,9 @@ class App extends Component {
         </div>
       </nav>
       <div id="titleStyle" ><h4>10/Oct/2021,  Match - India vs NZ</h4></div>
-      <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >PLAYERS AVAILABLE</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-                <th scope="col" >SELECT</th>
-            </tr>
-        </thead>
-        <tbody className="playersStyle" >
-            {this.renderPlayerTable()}
-        </tbody>
-      </table>
-      <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-            </tr>
-        </thead>
-        <tbody className="playersStyle" >
-            {this.renderSelectedPlayerTable()}
-            <tr>
-                <td>Total</td>
-                <td></td>
-                <td>{this.state.selectedPlayersCost}</td>
-                <td>{this.state.selectedPlayersPoints}</td>
-            </tr>
-        </tbody>
-      </table>
-      <table className="table" id="buttonTable">
-        <tbody>
-         <tr>
-          <td>
-           <button type="submit" disabled={this.state.selectedPlayers.length != 11} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
-          </td>
-          <td>
-           <button type="submit" disabled={this.state.fccPaid != 0} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
-          </td>
-         </tr>
-        </tbody>
-      </table>
-      <div id="titleStyle" ><h3>Previous Selection</h3></div>
-      <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-            </tr>
-        </thead>
-        <tbody className="playersStyle" >
-            {this.renderPreviousSelectedPlayerTable()}
-            <tr>
-                <td>Total</td>
-                <td></td>
-                <td>{this.state.previousSelectedPlayersCost}</td>
-                <td>{this.state.previousSelectedPlayersPoints}</td>
-            </tr>
-        </tbody>
-      </table>
-      <div className="App-intro">
-      </div>
       </div>
     );
   }
 }
 
-export default App;
+export default Results;

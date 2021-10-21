@@ -1,5 +1,11 @@
 /* Styles go here */
 
+#aboutStyle {
+  font-family: sans-serif;
+  line-height: 20px;
+  padding: 20px;
+}
+
 #menuStyle {
   font-family: sans-serif;
   font-size: 1.2em;
