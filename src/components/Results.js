@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch, Link } from 'react-router-dom';
-import Web3 from 'web3';
 import './App.css';
-import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
 import MatchFCC from '../abis/MatchFCC.json';
 import * as Constants from './Constants.js';
@@ -30,8 +27,6 @@ class Results extends Component {
     async loadBlockchainData()  {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
-
-        const networkId = Constants.NETWORK_ID; 
 
         const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, Constants.FCC_ADDRESS);
         this.setState({fcc});
