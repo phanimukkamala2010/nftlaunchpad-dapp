@@ -10,7 +10,7 @@ import * as Common from './Common.js';
 class Home extends Component {
 
     async componentWillMount()  {
-        await this.loadWeb3();
+        await Common.loadWeb3();
         await this.loadBlockchainData();
         await this.getPlayers();
         await this.runTimer();
@@ -19,10 +19,6 @@ class Home extends Component {
 
     async componentWillUnmount()    {
         clearInterval(this.interval);
-    }
-
-    async loadWeb3() {
-        Common.loadWeb3();
     }
 
     async loadBlockchainData()  {

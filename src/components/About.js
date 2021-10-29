@@ -5,29 +5,18 @@ import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
 import MatchFCC from '../abis/MatchFCC.json';
 import * as Constants from './Constants.js';
+import * as Common from './Common.js';
 
 class About extends Component {
 
     async componentWillMount()  {
-        await this.loadWeb3();
+        await Common.loadWeb3();
         await this.loadBlockchainData();
         await this.runTimer();
     }
 
     async componentWillUnmount()    {
         clearInterval(this.interval);
-    }
-
-    async loadWeb3() {
-        window.addEventListener('load', async () => {
-            if (window.ethereum) {
-                window.web3 = new Web3(window.ethereum);
-                await window.ethereum.enable();
-            }
-            else if(window.web3) {
-                window.web3 = new Web3(window.web3.currentProvider);
-            }
-        });
     }
 
     async callMint()    {
