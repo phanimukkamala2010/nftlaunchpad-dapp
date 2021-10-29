@@ -4,6 +4,7 @@ import './App.css';
 import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
 import MatchFCC from '../abis/MatchFCC.json';
+import * as Constants from './Constants.js';
 
 class Home extends Component {
 
@@ -32,12 +33,12 @@ class Home extends Component {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
 
-        const networkId = await window.web3.eth.net.getId();
+        const networkId = Constants.NETWORK_ID; 
 
-        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, FantasyCricketCoin.networks[networkId].address);
+        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, Constants.FCC_ADDRESS);
         this.setState({fcc});
 
-        const match = await window.web3.eth.Contract(MatchFCC.abi, MatchFCC.networks[networkId].address);
+        const match = await window.web3.eth.Contract(MatchFCC.abi, Constants.MATCH_ADDRESS);
         this.setState({match});
     }
 

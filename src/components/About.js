@@ -4,6 +4,7 @@ import './App.css';
 import logo from './fcc.png'
 import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
 import MatchFCC from '../abis/MatchFCC.json';
+import * as Constants from './Constants.js';
 
 class About extends Component {
 
@@ -35,11 +36,13 @@ class About extends Component {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
 
-        const networkId = await window.web3.eth.net.getId();
-        this.setState({fccAddress: FantasyCricketCoin.networks[networkId].address});
+        const networkId = Constants.NETWORK_ID; 
 
-        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, FantasyCricketCoin.networks[networkId].address);
+        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, Constants.FCC_ADDRESS);
         this.setState({fcc});
+
+        const match = await window.web3.eth.Contract(MatchFCC.abi, Constants.MATCH_ADDRESS);
+        this.setState({match});
     }
 
     async runTimer()  {
@@ -58,8 +61,7 @@ class About extends Component {
         super(props);
         this.state = {
             account: '',
-            balance: 0,
-            fccAddress: 0
+            balance: 0
         };
         this.callMint = this.callMint.bind(this);
         this.interval = setInterval(() => this.runTimer(), 10000);
@@ -94,7 +96,7 @@ class About extends Component {
       Fantasy Cricket Coin or FCC is a coin built on Ethereum blockchain.   <p/>
       Every new address will be able to mint 100 FCC coins. <p/>
       <p/> <p/> <p/>
-      <i>FCC Contract: {this.state.fccAddress} </i>
+      <i>FCC Contract: {Constants.FCC_ADDRESS} </i>
       </div>
       </div>
     );
