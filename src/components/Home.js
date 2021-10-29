@@ -72,6 +72,7 @@ class Home extends Component {
         const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
         if(bal) {
                 this.setState({balance: bal.toString()});
+                //console.log("bal=" + bal.toString());
         }
     }
 
@@ -123,7 +124,7 @@ class Home extends Component {
 
     async getPreviousSelectedPlayers()  {
         var playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
-        if(playerStr != null && !playerStr.includes(':')) {
+        if(playerStr == null || !playerStr.includes(':')) {
             return;
         }
         playerStr = playerStr.replace(';', ':');
