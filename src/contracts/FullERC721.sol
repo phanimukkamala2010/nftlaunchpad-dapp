@@ -1289,4 +1289,8 @@ library Strings {
         require(value == 0, "Strings: hex length insufficient");
         return string(buffer);
     }
+
+    function compare(string memory a, string memory b) internal pure returns (uint256) {
+        return (keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b)) ? 1 : 0);
+    }
 }
