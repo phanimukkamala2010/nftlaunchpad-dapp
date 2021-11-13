@@ -30,20 +30,20 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 claws;
 	}
 	
-	string[] private gender = [ "male", "female" ];
-	string[] private species = [ "human", "monster" ];
+	string[] private gender = [ "Male", "Female" ];
+	string[] private species = [ "Human", "Monster" ];
 	uint256[] private maxAge = [ 1024, 256];
 	string[] private weapons;
 
 	mapping (uint256 => PlayerInfo) private _tokenId2Player;
 
     constructor() ERC721("Dystopia", "DYSTOPIA") Ownable() {
-        weapons.push("handgun");
-        weapons.push("shotgun");
-        weapons.push("machinegun");
-        weapons.push("rifle");
-        weapons.push("sword");
-        weapons.push("energy-sword");
+        weapons.push("Handgun");
+        weapons.push("Shotgun");
+        weapons.push("Machinegun");
+        weapons.push("Rifle");
+        weapons.push("Sword");
+        weapons.push("Energy-sword");
 	}
 
     function addWeapon(string memory newWeapon) external onlyOwner {
@@ -124,7 +124,7 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = "MaxOffsprings:\t";
             parts[counter++] = Strings.toString(player.maxOffsprings);
         }
-        else if(isHuman){
+        else if(isHuman == 1){
             parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
             parts[counter++] = "Weapons:\t";
             parts[counter++] = player.weapons;
@@ -166,10 +166,10 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = "Claws:\t";
             parts[counter++] = (player.claws == 1 ? "Yes" : "No");
         }
-		parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
+		parts[counter++] = '</text><text x="10" y="280" class="baseWhite">';
         parts[counter++] = "CreationTime:\t";
         parts[counter++] = Strings.toString(player.creationTime);
-        parts[counter++] = '</text><text x="10" y="280" class="baseGreen">';
+        parts[counter++] = '</text><text x="10" y="300" class="baseGreen">';
         parts[counter++] = "AgeRemaining:\t";
         parts[counter++] = Strings.toString(player.ageRemaining);
         parts[counter++] = '</text></svg>';
@@ -187,7 +187,7 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
     }
 
     function mintPlayer(uint256 tokenId) public nonReentrant onlyOwner {
-        require(tokenId < 10000, "Token ID invalid");
+        require(tokenId > 0 && tokenId < 10000, "Token ID invalid");
         generatePlayer(tokenId);
         _safeMint(owner(), tokenId);
     }
