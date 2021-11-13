@@ -107,8 +107,8 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
 
         PlayerInfo memory player = _tokenId2Player[tokenId];
-        uint256 isHuman = Strings.compare(player.species, "human");
-        uint256 isFemale = Strings.compare(player.gender, "female");
+        uint256 isHuman = Strings.compare(player.species, "Human");
+        uint256 isFemale = Strings.compare(player.gender, "Female");
 
         string[64] memory parts;
 		uint256 counter = 0;
@@ -141,23 +141,23 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = "TechnicalSkills:\t";
             parts[counter++] = Strings.toString(player.technicalSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="180" class="baseGreen">';
+            parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
             parts[counter++] = "DoctorSkills:\t";
             parts[counter++] = Strings.toString(player.doctorSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
+            parts[counter++] = '</text><text x="10" y="200" class="baseGreen">';
             parts[counter++] = "LawyerSkills:\t";
             parts[counter++] = Strings.toString(player.lawyerSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="220" class="baseGreen">';
+            parts[counter++] = '</text><text x="10" y="220" class="baseWhite">';
             parts[counter++] = "PoliceSkills:\t";
             parts[counter++] = Strings.toString(player.policeSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
+            parts[counter++] = '</text><text x="10" y="240" class="baseGreen">';
             parts[counter++] = "SalesSkills:\t";
             parts[counter++] = Strings.toString(player.salesSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="260" class="baseGreen">';
+            parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
             parts[counter++] = "TeachingSkills:\t";
             parts[counter++] = Strings.toString(player.teachingSkills);
             parts[counter++] = "/10";
