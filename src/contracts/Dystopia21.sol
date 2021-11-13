@@ -110,28 +110,23 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
         string[64] memory parts;
 		uint256 counter = 0;
         parts[counter++] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">';
-		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 14px; }';
-		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 14px; }</style>';
+		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 16px; }';
+		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 16px; }</style>';
 		parts[counter++] = '<rect width="100%" height="100%" fill="black" />';
-		parts[counter++] = '<text x="10" y="20" class="baseWhite">';
-        parts[counter++] = "CreationTime:";
-        parts[counter++] = Strings.toString(player.creationTime);
-        parts[counter++] = '</text><text x="10" y="60" class="baseWhite">';
-        parts[counter++] = "Species:";
+        parts[counter++] = '<text x="10" y="40" class="baseWhite">';
+        parts[counter++] = "Species:\t";
         parts[counter++] = player.species;
-        parts[counter++] = '</text><text x="10" y="40" class="baseGreen">';
-        parts[counter++] = "Gender:";
+        parts[counter++] = '</text><text x="10" y="60" class="baseGreen">';
+        parts[counter++] = "Gender:\t";
         parts[counter++] = player.gender;
-        parts[counter++] = '</text><text x="10" y="80" class="baseWhite">';
-        parts[counter++] = "AgeRemaining:";
-        parts[counter++] = Strings.toString(player.ageRemaining);
-        parts[counter++] = '</text><text x="10" y="120" class="baseGreen">';
         if(isFemale == 1) {
-            parts[counter++] = "MaxOffsprings:";
+            parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
+            parts[counter++] = "MaxOffsprings:\t";
             parts[counter++] = Strings.toString(player.maxOffsprings);
         }
-        else {
-            parts[counter++] = "Weapons:";
+        else if(isHuman){
+            parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
+            parts[counter++] = "Weapons:\t";
             parts[counter++] = player.weapons;
         }
         if(isHuman == 1) {
@@ -140,37 +135,43 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = Strings.toString(player.politicalSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="160" class="baseGreen">';
-            parts[counter++] = "DoctorSkills:";
+            parts[counter++] = "DoctorSkills:\t";
             parts[counter++] = Strings.toString(player.doctorSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
-            parts[counter++] = "LawyerSkills:";
+            parts[counter++] = "LawyerSkills:\t";
             parts[counter++] = Strings.toString(player.lawyerSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="200" class="baseGreen">';
-            parts[counter++] = "PolicSkills:";
+            parts[counter++] = "PoliceSkills:\t";
             parts[counter++] = Strings.toString(player.policeSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="220" class="baseWhite">';
-            parts[counter++] = "SalesSkills:";
+            parts[counter++] = "SalesSkills:\t";
             parts[counter++] = Strings.toString(player.salesSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="240" class="baseGreen">';
-            parts[counter++] = "TeachingSkills:";
+            parts[counter++] = "TeachingSkills:\t";
             parts[counter++] = Strings.toString(player.teachingSkills);
             parts[counter++] = "/10";
         }
         else {
             parts[counter++] = '</text><text x="10" y="140" class="baseWhite">';
-            parts[counter++] = "Legs:";
+            parts[counter++] = "Legs:\t";
             parts[counter++] = Strings.toString(player.legs);
             parts[counter++] = '</text><text x="10" y="160" class="baseGreen">';
-            parts[counter++] = "Wings:";
+            parts[counter++] = "Wings:\t";
             parts[counter++] = (player.wings == 1 ? "Yes" : "No");
             parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
-            parts[counter++] = "Claws:";
+            parts[counter++] = "Claws:\t";
             parts[counter++] = (player.claws == 1 ? "Yes" : "No");
         }
+		parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
+        parts[counter++] = "CreationTime:\t";
+        parts[counter++] = Strings.toString(player.creationTime);
+        parts[counter++] = '</text><text x="10" y="280" class="baseGreen">';
+        parts[counter++] = "AgeRemaining:\t";
+        parts[counter++] = Strings.toString(player.ageRemaining);
         parts[counter++] = '</text></svg>';
 
         string memory output = "";
