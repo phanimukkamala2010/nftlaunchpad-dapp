@@ -18,11 +18,12 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
         //only for humans
 		string weapons;
         uint256 politicalSkills;
-        uint256 teachingSkills;
         uint256 doctorSkills;
-        uint256 lawyerSkills;
+        uint256 technicalSkills;
         uint256 policeSkills;
         uint256 salesSkills;
+        uint256 lawyerSkills;
+        uint256 teachingSkills;
 
         //only for monsters
         uint256 legs;
@@ -63,6 +64,7 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             player.species = species[0];
             player.ageRemaining = 512;
             player.politicalSkills = pluck(tokenId, "POLITICS") % 11;
+            player.technicalSkills = pluck(tokenId, "TECHNOLOGY") % 11;
             player.teachingSkills = pluck(tokenId, "TEACHER") % 11;
             player.doctorSkills = pluck(tokenId, "DOCTOR") % 11;
             player.lawyerSkills = pluck(tokenId, "LAWYER") % 11;
@@ -75,6 +77,7 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             player.species = species[0];
             player.ageRemaining = 512;
             player.maxOffsprings = pluck(tokenId, "OFFSPRING") % 6;
+            player.technicalSkills = pluck(tokenId, "TECHNOLOGY") % 11;
             player.politicalSkills = pluck(tokenId, "POLITICS") % 11;
             player.teachingSkills = pluck(tokenId, "TEACHER") % 11;
             player.doctorSkills = pluck(tokenId, "DOCTOR") % 11;
@@ -135,22 +138,26 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = Strings.toString(player.politicalSkills);
             parts[counter++] = "/10";
             parts[counter++] = '</text><text x="10" y="160" class="baseGreen">';
+            parts[counter++] = "TechnicalSkills:\t";
+            parts[counter++] = Strings.toString(player.technicalSkills);
+            parts[counter++] = "/10";
+            parts[counter++] = '</text><text x="10" y="180" class="baseGreen">';
             parts[counter++] = "DoctorSkills:\t";
             parts[counter++] = Strings.toString(player.doctorSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
+            parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
             parts[counter++] = "LawyerSkills:\t";
             parts[counter++] = Strings.toString(player.lawyerSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="200" class="baseGreen">';
+            parts[counter++] = '</text><text x="10" y="220" class="baseGreen">';
             parts[counter++] = "PoliceSkills:\t";
             parts[counter++] = Strings.toString(player.policeSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="220" class="baseWhite">';
+            parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
             parts[counter++] = "SalesSkills:\t";
             parts[counter++] = Strings.toString(player.salesSkills);
             parts[counter++] = "/10";
-            parts[counter++] = '</text><text x="10" y="240" class="baseGreen">';
+            parts[counter++] = '</text><text x="10" y="260" class="baseGreen">';
             parts[counter++] = "TeachingSkills:\t";
             parts[counter++] = Strings.toString(player.teachingSkills);
             parts[counter++] = "/10";
@@ -166,10 +173,10 @@ contract Dystopia21 is ERC721Enumerable, ReentrancyGuard, Ownable {
             parts[counter++] = "Claws:\t";
             parts[counter++] = (player.claws == 1 ? "Yes" : "No");
         }
-		parts[counter++] = '</text><text x="10" y="280" class="baseWhite">';
+		parts[counter++] = '</text><text x="10" y="300" class="baseWhite">';
         parts[counter++] = "CreationTime:\t";
         parts[counter++] = Strings.toString(player.creationTime);
-        parts[counter++] = '</text><text x="10" y="300" class="baseGreen">';
+        parts[counter++] = '</text><text x="10" y="320" class="baseGreen">';
         parts[counter++] = "AgeRemaining:\t";
         parts[counter++] = Strings.toString(player.ageRemaining);
         parts[counter++] = '</text></svg>';
