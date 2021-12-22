@@ -138,11 +138,14 @@ contract MetaBox is ERC721Enumerable, ReentrancyGuard, Ownable {
     }
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
+        uint256 rand = random(string(abi.encodePacked("BACKGROUND", Strings.toString(tokenId))));
 
         string[64] memory parts;
 		uint256 counter = 0;
         parts[counter++] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">';
-		parts[counter++] = '<rect width="100%" height="100%" fill="black" />';
+		parts[counter++] = '<rect width="100%" height="100%" fill="';
+        parts[counter++] = _colors[rand%35];
+        parts[counter++] = '" />';
         parts[counter++] = pluckBody(tokenId);
         parts[counter++] = pluckShirt(tokenId);
         parts[counter++] = pluckTie(tokenId);
