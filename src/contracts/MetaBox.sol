@@ -56,24 +56,20 @@ contract MetaBox is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory str = "";
         if(rand%5 == 0) {
             str = string(abi.encodePacked(str, '<path d="M 100 120 l 10 120 l 120 -10 l -10 -120 l -120 10 " style="fill: '));
-            str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>));
         }
         else if(rand%5 == 1) {
             str = string(abi.encodePacked(str, '<path d="M 100 235 l 140 -10 l -80 -120 l -55 120 " style="fill: '));
-            str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>));
         }
         else if(rand%5 == 2) {
             str = string(abi.encodePacked(str, '<path d="M 80 235 l 180 -10 l -10 -90 l -180 10 l 10 90 " style="fill: '));
-            str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>));
         }
         else if(rand%5 == 3) {
             str = string(abi.encodePacked(str, '<path d="M 110 180 a 60 60 0 0 0 60 60 a 60 60 0 0 0 60 -60 a 60 60 0 0 0 -60 -60 a 60 60 0 0 0 -60 60 " style="fill: '));
-            str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>));
         }
         else if(rand%5 == 4) {
             str = string(abi.encodePacked(str, '<path d="M 105 160 a 60 80 -10 0 0 60 80 a 60 80 -10 0 0 60 -80 a 60 80 -10 0 0 -60 -80 a 60 80 -10 0 0 -60 80 " style="fill: '));
-            str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>));
         }
+        str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>'));
         return str;
     }
 
@@ -82,12 +78,13 @@ contract MetaBox is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory str = "";
         if(rand%2 == 0) {
             str = string(abi.encodePacked(str, '<path d="M 130 270 a 50 5 0 0 0 85 0 l 10 5 a 50 5 0 0 1 -45 5 l 5 50 l -15 10 l -15 -10 '));
-            str = string(abi.encodePacked(str, 'l 5 -50 a 50 5 0 0 1 -48 -5 " style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>'));
+            str = string(abi.encodePacked(str, 'l 5 -50 a 50 5 0 0 1 -48 -5 " style="fill: '));
         }
         else {
             str = string(abi.encodePacked(str, '<path d="M 130 275 a 50 50 0 0 0 0 30 l 30 -10 l 20 0 l 30 10 a 50 50 0 0 0 0 -30 '));
-            str = string(abi.encodePacked(str, 'l -30 10 l -20 0 l -30 -10 " style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>'));
+            str = string(abi.encodePacked(str, 'l -30 10 l -20 0 l -30 -10 " style="fill: '));
         }
+        str = string(abi.encodePacked(str, _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>'));
         return str;
     }
 
@@ -96,15 +93,12 @@ contract MetaBox is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory str = "";
         if(rand%2 == 0) {
             str = string(abi.encodePacked(str, '<path d="M 170 300 l -40 -30 l -72 15 l -25 70 h 275 0 l -30 -70 l -72 -15 l -40 30 '));
-            str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35]));
-            str = string(abi.encodePacked(str, '; stroke: grey; stroke-width: 0.5; stroke-linejoin: round; stroke-linecap: round" />'));
         }
         else {
             str = string(abi.encodePacked(str, '<path d="M 120 278 l -10 1 l 1 25 l 2 25 l -1 25 h 130 l -2 -25 l -2 -25 l -2 -25 l -10 -1 '));
             str = string(abi.encodePacked(str, 'v 25 a 52 52 0 0 1 -52 40 a 52 52 0 0 1 -52 -40 v -25 '));
-            str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35]));
-            str = string(abi.encodePacked(str, '; stroke: none; stroke-width: 0.5"/>'));
         }
+        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.5"/>'));
         return str;
     }
 
@@ -133,13 +127,13 @@ contract MetaBox is ERC721Enumerable, ReentrancyGuard, Ownable {
     function addArmpits() internal pure returns (string memory) {
         string memory str = "";
         str = string(abi.encodePacked(str, '<path d="M 100 320 l -4 20 l -4 40 l -4 40 " style="fill: none; stroke: grey; stroke-width: 1" />'));
-        str = string(abi.encodePacked(str, '<path d="M 101 320 l -4 20 l -4 40 l -4 40 " style="fill: none; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 240 320 l 4 20 l 4 40 l 4 40 " style="fill: none; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 241 320 l 4 20 l 4 40 l 4 40 " style="fill: none; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 58 285 l 20 15 l 20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 58 286 l 20 15 l 20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 280 285 l -20 15 l -20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />));
-        str = string(abi.encodePacked(str, '<path d="M 280 286 l -20 15 l -20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />));
+        str = string(abi.encodePacked(str, '<path d="M 101 320 l -4 20 l -4 40 l -4 40 " style="fill: none; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 240 320 l 4 20 l 4 40 l 4 40 " style="fill: none; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 241 320 l 4 20 l 4 40 l 4 40 " style="fill: none; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 58 285 l 20 15 l 20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 58 286 l 20 15 l 20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 280 285 l -20 15 l -20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />'));
+        str = string(abi.encodePacked(str, '<path d="M 280 286 l -20 15 l -20 20 " style="fill: grey; stroke: grey; stroke-width: 1" />'));
         return str;
     }
 
