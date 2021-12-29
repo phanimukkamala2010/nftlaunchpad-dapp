@@ -56,11 +56,11 @@ contract MetaGals is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory str = "";
         str = string(abi.encodePacked(str, '<path d="M 150,350 a 120 120 0 0 1 0 -50 a 120 120 0 0 1 30 30 a 120 120 0 0 1 30 -30 '));
         str = string(abi.encodePacked(str, 'a 120 120 0 0 1 0 50" '));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 0.3"/>'));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 0.3"/>'));
         str = string(abi.encodePacked(str, '<path d="M 165,180 a 30 60 0 0 1 15 0 l 2 0 a 30 60 0 0 1 15 0 a 20 20 0 0 1 -30 0" '));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 1"/>'));
-        str = string(abi.encodePacked(str, '<path d="M 165,180 a 60 60 0 0 0 30 0"'));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 2"/>'));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 1"/>'));
+        str = string(abi.encodePacked(str, '<path d="M 165,180 a 60 60 0 0 0 30 0" '));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 2"/>'));
         return str;
     }
 
@@ -70,7 +70,7 @@ contract MetaGals is ERC721Enumerable, ReentrancyGuard, Ownable {
         str = string(abi.encodePacked(str, '<path d="M 325,350 a 120 120 0 0 1 -10 -50 a 120 120 0 0 0 -10 -50 '));
         str = string(abi.encodePacked(str, 'a 120 120 0 0 1 -20 -100 a 120 120 0 0 0 -30 -100 a 120 120 0 0 0 -150 0 a 120 120 0 0 0 -30 100 '));
         str = string(abi.encodePacked(str, 'a 120 120 0 0 1 -20 100 a 120 120 0 0 0 -10 50 a 120 120 0 0 1 -10 50" '));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 0.3"/>'));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: black; stroke-width: 0.3"/>'));
         return str;
     }
 
@@ -79,12 +79,12 @@ contract MetaGals is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory str = "";
         str = string(abi.encodePacked(str, '<path d="M 160,200 v 50 a 120 120 0 0 1 -30 10 a 180 180 0 0 0 0 100 '));
         str = string(abi.encodePacked(str, 'h 100 a 180 180 0 0 0 0 -100 a 120 120 0 0 0 -30 -10 v -50" '));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.2"/>'));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.2"/>'));
 
         str = string(abi.encodePacked(str, '<path d="M 100,130 a 120 120 0 0 0 20 60 a 120 120 0 0 0 60 30 a 120 120 0 0 0 60 -30 '));
         str = string(abi.encodePacked(str, 'a 120 120 0 0 0 20 -60 a 120 120 0 0 0 -10 -40 a 50 50 0 0 0 -50 -10 a 50 50 0 0 1 -50 -10 '));
         str = string(abi.encodePacked(str, 'a 50 50 0 0 1 -45 10 a 120 120 0 0 0 -5 50" '));
-        str = string(abi.encodePacked(str, '" style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.2"/>'));
+        str = string(abi.encodePacked(str, 'style="fill: ', _colors[rand%35], '; stroke: none; stroke-width: 0.2"/>'));
 
         str = string(abi.encodePacked(str, '<path d="M 160,140 a 30 30 0 0 0 -40 -10 a 30 30 0 0 0 35 10 z"  style="fill:white;stroke:black;stroke-width:2" />'));
         str = string(abi.encodePacked(str, '<circle cx="142" cy="133" r="6" style="fill:black" /> <circle cx="142" cy="132" r="1" style="fill:white" />'));
