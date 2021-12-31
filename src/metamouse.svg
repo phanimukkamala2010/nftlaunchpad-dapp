@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350">
+
+<!-- view box -->
+<path d="M 0 0 v 350 h 350 v -350 " style="fill: honeydew; stroke: grey; stroke-width: 0.5" />
+
+<!-- tail, legs -->
+<path d="M 90 190
+         a 30 10 0 0 0 30 25
+         l 2 2
+         a 30 10 0 0 1 -30 -25"
+         style="fill:black;stroke:black;stroke-width:1" />
+<!-- body -->
+<path d="M 320,150
+         a 90 90 0 0 0 -50 -30
+         a 10 30 0 0 0 -30 -20
+         a 10 30 0 0 0 -30 20
+         a 50 40 0 0 0 -120 90
+         a 30 30 0 0 0 40 10
+         a 50 50 0 0 0 20 10
+         a 50 30 0 0 0 30 -10
+         a 90 90 0 0 0 70 -30
+         a 90 90 0 0 0 70 -30
+         z"
+         style="fill:darksalmon;stroke:black;stroke-width:0.3" />
+
+<!-- eyes -->
+<circle cx="280" cy="140" r="6" style="fill:white;stroke:black;stroke-width:0.3" />
+<circle cx="282" cy="139" r="4" style="fill:black;stroke:black;stroke-width:0.3" >
+        <animateTransform attributeName="transform"
+                    type="rotate"
+                    from="0 280 139" to="360 280 139"
+                    begin="0s" dur="10s"
+                    repeatCount="indefinite" />
+</circle>
+
+<!-- extras -->
+<path d="M 310 160 a 30 30 0 0 0 -10 25" style="fill:none;stroke:black;stroke-width:2" />
+<path d="M 305 160 a 30 30 0 0 0 -20 20" style="fill:none;stroke:black;stroke-width:2" />
+<path d="M 300 160 a 30 30 0 0 0 -30 20" style="fill:none;stroke:black;stroke-width:2" />
+<path d="M 320,150 a 10 10 0 0 0 -5 5 a 10 10 0 0 0 5 5" style="black:none;stroke:black;stroke-width:2" />
+
+</svg>
