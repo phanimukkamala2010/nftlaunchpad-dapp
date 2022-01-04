@@ -7,7 +7,7 @@ import "./FullERC721.sol";
 contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 
 	struct PlayerInfo {
-        bytes32 name;
+        string name;
         uint256 state;       //0 - burnt, 1 - active
 		uint256 gender;      //0 - FEMALE, 1 - MALE
         uint256 district;    //1 to 12
@@ -26,22 +26,16 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 	string[] private gender = [ "Female", "Male" ];
 	string[] private skills = [ "Below Average", "Average", "Above Average", "Gifted" ];
 	
-    uint256 private _price = 0.05 ether;
+    uint256 public _price = 0.05 ether;
     bool public _paused = true;
     bool public _matingPaused = true;
     bool public _reclaimPaused = true;
 
-	mapping (uint256 => PlayerInfo) private _tokenId2Player;
-    mapping (uint256 => string) private _Id2URI;
+	mapping (uint256 => PlayerInfo) public _tokenId2Player;
 
     constructor() ERC721("HungerVerse", "HUNGER") Ownable() {
 	}
 
-    function stringToBytes32(string memory source) internal pure returns (bytes32 result) {
-        assembly {
-            result := mload(add(source, 32))
-        }
-    }
 	function generatePlayer(uint256 tokenId) internal {
 		PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
 
@@ -62,9 +56,6 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         return random(string(abi.encodePacked(keyPrefix, Strings.toString(tokenId))));
     }
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
-        return _Id2URI[tokenId];
-    }
-    function updateTokenURI(uint256 tokenId) internal {
         PlayerInfo memory player = _tokenId2Player[tokenId];
 
         string[64] memory parts;
@@ -77,7 +68,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         parts[counter++] = gender[player.gender];
         parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
         parts[counter++] = "Name:\t";
-        parts[counter++] = (player.name[0] != 0) ? string(abi.encodePacked(player.name)) : '';
+        parts[counter++] = bytes(player.name).length > 0 ? player.name : '';
 
         if(player.gender == 0) {
             parts[counter++] = '</text><text x="10" y="120" class="baseWhite">';
@@ -108,36 +99,36 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Hungerite #', Strings.toString(tokenId), '", "description": "HungerVerse is a game of survival.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
         output = string(abi.encodePacked('data:application/json;base64,', json));
 
-        _Id2URI[tokenId] = output;
+        return output;
     }
     function ownHungerites(uint256 num) public nonReentrant payable {
         uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
-        require(supply + num < 24000, "Exceeds maximum supply");
+        require(supply + num <= 24000, "Exceeds maximum supply");
         require(msg.value >= _price * num, "Ether sent is not correct");
 
-        for(uint256 i = 0; i < num; i++) {
+        for(uint256 i = 1; i <= num; i++) {
             generatePlayer(supply + i);
             _safeMint(msg.sender, supply + i);
         }
     }
-    function reclaimHungerites(uint256 num) public nonReentrant payable {
+    function reclaimHungerites(uint256 num) public payable {
         uint256 supply = totalSupply();
         require(!_reclaimPaused, "reclaim paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
-        require(supply + num < 24000, "Exceeds maximum supply");
+        require(supply + num <= 24000, "Exceeds maximum supply");
         require(msg.value >= _price * num, "Ether sent is not correct");
 
         uint256 count = 0;
-        for(uint256 i = 0; i < 24000; i++) {
+        for(uint256 i = 1; i <= 24000; i++) {
             if(_tokenId2Player[i].state == 1) continue;
             generatePlayer(i);
             _safeMint(msg.sender, i);
             if(++count == num) break;
         }
     }
-    function mate(uint256 tokenIdM, uint256 tokenIdF) public nonReentrant {
+    function mate(uint256 tokenIdM, uint256 tokenIdF) public {
         uint256 supply = totalSupply();
         require(!_matingPaused, "Mating paused");
         require(_isApprovedOrOwner(msg.sender, tokenIdM), "not authorized");
@@ -147,16 +138,29 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         PlayerInfo storage female = _tokenId2Player[tokenIdF];
         require(female.gender == 0, "second token should be female");
         require(female.offsprings > 0, "no offsprings");
-        require(supply + female.offsprings < 24000, "Exceeds maximum supply");
+        require(supply + female.offsprings <= 24000, "Exceeds maximum supply");
 
         uint256 count = 0;
-        for(uint256 i; i < 24000; i++) {
+        for(uint256 i = 1; i <= 24000; i++) {
             if(_tokenId2Player[i].state == 1) continue;
             generatePlayer(i);
             _safeMint(msg.sender, i);
             if(++count == female.offsprings) break;
         }
         female.offsprings = 0;
+    }
+    function like(uint256 tokenId) public {
+        PlayerInfo storage player = _tokenId2Player[tokenId];
+        player.likes++;
+    }
+    function setMatingPause(bool val) public onlyOwner {
+        _matingPaused = val;
+    }
+    function setReclaimPause(bool val) public onlyOwner {
+        _reclaimPaused = val;
+    }
+    function getDistrict(uint256 tokenId) external view returns (uint256) {
+        return _tokenId2Player[tokenId].district;
     }
     function burn(uint256 tokenId) public {
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
@@ -168,28 +172,13 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     function setName(uint256 tokenId, string memory val) public {
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
-        player.name = stringToBytes32(val);
-        updateTokenURI(tokenId);
-    }
-    function like(uint256 tokenId) public {
-        PlayerInfo storage player = _tokenId2Player[tokenId];
-        player.likes++;
-        updateTokenURI(tokenId);
+        player.name = val;
     }
     function setPrice(uint256 _newPrice) public onlyOwner {
         _price = _newPrice;
     }
-    function getPrice() public view returns (uint256) {
-        return _price;
-    }
     function setPause(bool val) public onlyOwner {
         _paused = val;
-    }
-    function setMatingPause(bool val) public onlyOwner {
-        _matingPaused = val;
-    }
-    function setReclaimPause(bool val) public onlyOwner {
-        _reclaimPaused = val;
     }
     function withdraw() public payable onlyOwner {
         address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;
