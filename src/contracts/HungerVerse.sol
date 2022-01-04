@@ -9,7 +9,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 	struct PlayerInfo {
         string name;
         uint256 state;       //0 - burnt, 1 - active
-		uint256 gender;      //0 - FEMALE, 1 - MALE
+        uint256 gender;      //0 - FEMALE, 1 - MALE
         uint256 district;    //1 to 12
 
         //only for females
@@ -23,21 +23,21 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 wins;
         uint256 burns;
 	}
-	string[] private gender = [ "Female", "Male" ];
-	string[] private skills = [ "Below Average", "Average", "Above Average", "Gifted" ];
+    string[] private gender = [ "Female", "Male" ];
+    string[] private skills = [ "Below Average", "Average", "Above Average", "Gifted" ];
 	
     uint256 public _price = 0.05 ether;
     bool public _paused = true;
     bool public _matingPaused = true;
     bool public _reclaimPaused = true;
 
-	mapping (uint256 => PlayerInfo) public _tokenId2Player;
+    mapping (uint256 => PlayerInfo) public _tokenId2Player;
 
     constructor() ERC721("HungerVerse", "HUNGER") Ownable() {
 	}
 
-	function generatePlayer(uint256 tokenId) internal {
-		PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
+    function generatePlayer(uint256 tokenId) internal {
+        PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
 
         player.state = 1;
         player.gender = pluck(tokenId, "GENDER") % 2;
@@ -47,7 +47,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         }
         player.huntingSkills = (player.wins + player.burns + pluck(tokenId, "HUNTING")) % 4;
         player.IQ = (player.wins + player.burns + pluck(tokenId, "IQSCORE")) % 4;
-	}
+    }
 
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
@@ -81,10 +81,13 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
         parts[counter++] = "IQ:\t";
         parts[counter++] = skills[player.IQ];
-        parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="220" class="baseWhite">';
+        parts[counter++] = "Likes:\t";
+        parts[counter++] = Strings.toString(player.likes);
+        parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
         parts[counter++] = "wins:\t";
         parts[counter++] = Strings.toString(player.wins);
-        parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="280" class="baseWhite">';
         parts[counter++] = "burns:\t";
         parts[counter++] = Strings.toString(player.burns);
 
@@ -149,16 +152,16 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         }
         female.offsprings = 0;
     }
-    function like(uint256 tokenId) public {
-        PlayerInfo storage player = _tokenId2Player[tokenId];
-        player.likes++;
-    }
-    function setMatingPause(bool val) public onlyOwner {
-        _matingPaused = val;
-    }
-    function setReclaimPause(bool val) public onlyOwner {
-        _reclaimPaused = val;
-    }
+	function like(uint256 tokenId) public {
+		PlayerInfo storage player = _tokenId2Player[tokenId];
+		player.likes++;
+	}
+	function setMatingPause(bool val) public onlyOwner {
+		_matingPaused = val;
+	}
+	function setReclaimPause(bool val) public onlyOwner {
+		_reclaimPaused = val;
+	}
     function getDistrict(uint256 tokenId) external view returns (uint256) {
         return _tokenId2Player[tokenId].district;
     }
