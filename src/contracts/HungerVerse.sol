@@ -32,6 +32,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     bool public _reclaimPaused = true;
 
 	mapping (uint256 => PlayerInfo) private _tokenId2Player;
+    mapping (uint256 => string) private _Id2URI;
 
     constructor() ERC721("HungerVerse", "HUNGER") Ownable() {
 	}
@@ -57,13 +58,13 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
     }
-
     function pluck(uint256 tokenId, string memory keyPrefix) internal pure returns (uint256) {
         return random(string(abi.encodePacked(keyPrefix, Strings.toString(tokenId))));
     }
-
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
-
+        return _Id2URI[tokenId];
+    }
+    function updateTokenURI(uint256 tokenId) internal {
         PlayerInfo memory player = _tokenId2Player[tokenId];
 
         string[64] memory parts;
@@ -76,24 +77,25 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         parts[counter++] = gender[player.gender];
         parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
         parts[counter++] = "Name:\t";
-        parts[counter++] = string(abi.encodePacked(player.name));
+        parts[counter++] = (player.name[0] != 0) ? string(abi.encodePacked(player.name)) : '';
+
         if(player.gender == 0) {
             parts[counter++] = '</text><text x="10" y="120" class="baseWhite">';
             parts[counter++] = "Offsprings:\t";
             parts[counter++] = Strings.toString(player.offsprings);
         }
-        parts[counter++] = '</text><text x="10" y="140" class="baseWhite">';
-        parts[counter++] = "wins:\t";
-        parts[counter++] = Strings.toString(player.wins);
-        parts[counter++] = '</text><text x="10" y="160" class="baseWhite">';
-        parts[counter++] = "burns:\t";
-        parts[counter++] = Strings.toString(player.burns);
         parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
         parts[counter++] = "HuntingSkills:\t";
         parts[counter++] = skills[player.huntingSkills];
         parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
         parts[counter++] = "IQ:\t";
         parts[counter++] = skills[player.IQ];
+        parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
+        parts[counter++] = "wins:\t";
+        parts[counter++] = Strings.toString(player.wins);
+        parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
+        parts[counter++] = "burns:\t";
+        parts[counter++] = Strings.toString(player.burns);
 
         parts[counter++] = '</text></svg>';
 
@@ -106,9 +108,8 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "Hungerite #', Strings.toString(tokenId), '", "description": "HungerVerse is a game of survival.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
         output = string(abi.encodePacked('data:application/json;base64,', json));
 
-        return output;
+        _Id2URI[tokenId] = output;
     }
-
     function ownHungerites(uint256 num) public nonReentrant payable {
         uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
@@ -168,10 +169,12 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.name = stringToBytes32(val);
+        updateTokenURI(tokenId);
     }
     function like(uint256 tokenId) public {
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.likes++;
+        updateTokenURI(tokenId);
     }
     function setPrice(uint256 _newPrice) public onlyOwner {
         _price = _newPrice;
