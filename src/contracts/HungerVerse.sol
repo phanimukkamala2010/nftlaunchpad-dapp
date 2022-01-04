@@ -30,13 +30,14 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     bool public _paused = true;
     bool public _matingPaused = true;
     bool public _reclaimPaused = true;
+    address public otherContract;
 
-    mapping (uint256 => PlayerInfo) public _tokenId2Player;
+    mapping (uint256 => PlayerInfo) private _tokenId2Player;
 
     constructor() ERC721("HungerVerse", "HUNGER") Ownable() {
 	}
 
-    function generatePlayer(uint256 tokenId) internal {
+    function generatePlayer(uint256 tokenId) private {
         PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
 
         player.state = 1;
@@ -49,10 +50,10 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         player.IQ = (player.wins + player.burns + pluck(tokenId, "IQSCORE")) % 4;
     }
 
-    function random(string memory input) internal pure returns (uint256) {
+    function random(string memory input) private pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
     }
-    function pluck(uint256 tokenId, string memory keyPrefix) internal pure returns (uint256) {
+    function pluck(uint256 tokenId, string memory keyPrefix) private pure returns (uint256) {
         return random(string(abi.encodePacked(keyPrefix, Strings.toString(tokenId))));
     }
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
@@ -104,7 +105,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 
         return output;
     }
-    function ownHungerites(uint256 num) public nonReentrant payable {
+    function ownHungerites(uint256 num) external nonReentrant payable {
         uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
@@ -116,7 +117,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
             _safeMint(msg.sender, supply + i);
         }
     }
-    function reclaimHungerites(uint256 num) public payable {
+    function reclaimHungerites(uint256 num) external payable {
         uint256 supply = totalSupply();
         require(!_reclaimPaused, "reclaim paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
@@ -131,7 +132,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
             if(++count == num) break;
         }
     }
-    function mate(uint256 tokenIdM, uint256 tokenIdF) public {
+    function mate(uint256 tokenIdM, uint256 tokenIdF) external {
         uint256 supply = totalSupply();
         require(!_matingPaused, "Mating paused");
         require(_isApprovedOrOwner(msg.sender, tokenIdM), "not authorized");
@@ -152,38 +153,42 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         }
         female.offsprings = 0;
     }
-	function like(uint256 tokenId) public {
+	function like(uint256 tokenId) external {
 		PlayerInfo storage player = _tokenId2Player[tokenId];
 		player.likes++;
 	}
-	function setMatingPause(bool val) public onlyOwner {
+	function setMatingPause(bool val) external onlyOwner {
 		_matingPaused = val;
 	}
-	function setReclaimPause(bool val) public onlyOwner {
+	function setReclaimPause(bool val) external onlyOwner {
 		_reclaimPaused = val;
 	}
     function getDistrict(uint256 tokenId) external view returns (uint256) {
         return _tokenId2Player[tokenId].district;
     }
-    function burn(uint256 tokenId) public {
+    function burn(uint256 tokenId) external {
+        require(msg.sender == otherContract);
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.state = 0;
         player.burns++;
         _burn(tokenId);
     }
-    function setName(uint256 tokenId, string memory val) public {
+    function setName(uint256 tokenId, string memory val) external {
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.name = val;
     }
-    function setPrice(uint256 _newPrice) public onlyOwner {
+    function setPrice(uint256 _newPrice) external onlyOwner {
         _price = _newPrice;
     }
-    function setPause(bool val) public onlyOwner {
+    function setPause(bool val) external onlyOwner {
         _paused = val;
     }
-    function withdraw() public payable onlyOwner {
+    function setOtherContract(address _otherContract) external onlyOwner {
+        otherContract = _otherContract;
+    }
+    function withdraw() external payable onlyOwner {
         address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;
         require(payable(t1).send(address(this).balance));
     }
