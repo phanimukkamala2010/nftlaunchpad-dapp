@@ -9,14 +9,13 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 	struct PlayerInfo {
         string name;
         uint256 state;       //0 - burnt, 1 - active
-        uint256 gender;      //0 - FEMALE, 1 - MALE
+        uint256 gender;
         uint256 district;    //1 to 12
 
         //only for females
         uint256 offsprings;  // 0 to 8
 
-        //gifted = 3, above average = 2, average = 1, below average = 0
-        uint256 huntingSkills;
+        uint256 HS;         //hunting skills
         uint256 IQ;
         uint256 likes;
 
@@ -30,13 +29,11 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     bool public _paused = true;
     bool public _matingPaused = true;
     bool public _reclaimPaused = true;
-    address public otherContract;
 
     mapping (uint256 => PlayerInfo) private _tokenId2Player;
 
     constructor() ERC721("HungerVerse", "HUNGER") Ownable() {
 	}
-
     function generatePlayer(uint256 tokenId) private {
         PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
 
@@ -46,10 +43,13 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         if(player.gender == 0) {
             player.offsprings = pluck(tokenId, "OFFSPRINGS") % 9;
         }
-        player.huntingSkills = (player.wins + player.burns + pluck(tokenId, "HUNTING")) % 4;
+        player.HS = (player.wins + player.burns + pluck(tokenId, "HUNTING")) % 4;
         player.IQ = (player.wins + player.burns + pluck(tokenId, "IQSCORE")) % 4;
     }
-
+    function getPlayerInfo(uint256 tokenId) external view returns (uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256) {
+        PlayerInfo memory player = _tokenId2Player[tokenId];
+        return (player.state, player.gender, player.district, player.HS, player.IQ, player.likes, player.wins, player.burns);
+    }
     function random(string memory input) private pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
     }
@@ -68,6 +68,9 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         parts[counter++] = '<text x="10" y="60" class="baseGreen">';
         parts[counter++] = gender[player.gender];
         parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
+        parts[counter++] = "District:\t";
+        parts[counter++] = Strings.toString(player.district);
+        parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
         parts[counter++] = "Name:\t";
         parts[counter++] = bytes(player.name).length > 0 ? player.name : '';
 
@@ -78,7 +81,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
         }
         parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
         parts[counter++] = "HuntingSkills:\t";
-        parts[counter++] = skills[player.huntingSkills];
+        parts[counter++] = skills[player.HS];
         parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
         parts[counter++] = "IQ:\t";
         parts[counter++] = skills[player.IQ];
@@ -105,7 +108,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 
         return output;
     }
-    function ownHungerites(uint256 num) external nonReentrant payable {
+    function own(uint256 num) external nonReentrant payable {
         uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
@@ -117,7 +120,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
             _safeMint(msg.sender, supply + i);
         }
     }
-    function reclaimHungerites(uint256 num) external payable {
+    function reclaim(uint256 num) external payable {
         uint256 supply = totalSupply();
         require(!_reclaimPaused, "reclaim paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
@@ -163,11 +166,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 	function setReclaimPause(bool val) external onlyOwner {
 		_reclaimPaused = val;
 	}
-    function getDistrict(uint256 tokenId) external view returns (uint256) {
-        return _tokenId2Player[tokenId].district;
-    }
     function burn(uint256 tokenId) external {
-        require(msg.sender == otherContract);
         require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.state = 0;
@@ -184,9 +183,6 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     }
     function setPause(bool val) external onlyOwner {
         _paused = val;
-    }
-    function setOtherContract(address _otherContract) external onlyOwner {
-        otherContract = _otherContract;
     }
     function withdraw() external payable onlyOwner {
         address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;

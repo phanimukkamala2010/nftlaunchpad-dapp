@@ -7,6 +7,19 @@ import "./HungerVerse.sol";
 
 contract HungerGames is Context {
 
+	struct PlayerInfo {
+        uint256 state;       //0 - burnt, 1 - active
+        uint256 gender;      //0 - FEMALE, 1 - MALE
+        uint256 district;    //1 to 12
+
+        uint256 HS;
+        uint256 IQ;
+        uint256 likes;
+
+        uint256 wins;
+        uint256 burns;
+	}
+
     bool public _gamingPaused = true;
 
     bool public _gameInProgress = false;
@@ -21,17 +34,23 @@ contract HungerGames is Context {
         require(verse.owner() == _msgSender(), "caller is not the owner");
         _;
     }
-
+    function getPlayerInfo(uint256 tokenId) private returns (PlayerInfo memory) {
+        PlayerInfo memory player;
+        (player.state, player.gender, player.district, player.HS, player.IQ, player.likes, player.wins, player.burns) = verse.getPlayerInfo(tokenId);
+        return player;
+    }
 	function setGamingPaused(bool val) external onlyOwner {
 		_gamingPaused = val;
 	}
     function joinGame(uint256 tokenId) external payable {
         require(!_gamingPaused, "gaming paused");
         require(msg.value >= verse._price(), "Ether sent is not correct");
-
+        
+        PlayerInfo memory player = getPlayerInfo(tokenId);
         uint256 count = 0;
         for(uint256 i = 0; i < players.length; ++i) {
-            if(verse.getDistrict(players[i]) == verse.getDistrict(tokenId)) {
+            PlayerInfo memory player2 = getPlayerInfo(players[i]);
+            if(player2.district == player.district) {
                 ++count;
             }
         }
