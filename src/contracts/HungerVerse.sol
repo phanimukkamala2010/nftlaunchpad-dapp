@@ -64,12 +64,12 @@ contract HungerVerse is ERC721Enumerable, Ownable {
         string[64] memory parts;
 		uint256 counter = 0;
         parts[counter++] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">';
-		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 16px; }';
-		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 16px; }</style>';
+		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 20px; }';
+		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 20px; }</style>';
 		parts[counter++] = '<rect width="100%" height="100%" fill="black" />';
         parts[counter++] = '<text x="10" y="60" class="baseGreen">';
         parts[counter++] = gender[player.gender];
-        parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="80" class="baseWhite">';
         parts[counter++] = "District:\t";
         parts[counter++] = Strings.toString(player.district);
         parts[counter++] = '</text><text x="10" y="100" class="baseWhite">';
@@ -81,19 +81,19 @@ contract HungerVerse is ERC721Enumerable, Ownable {
             parts[counter++] = "Offsprings:\t";
             parts[counter++] = Strings.toString(player.offsprings);
         }
-        parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="160" class="baseWhite">';
         parts[counter++] = "HuntingSkills:\t";
         parts[counter++] = skills[player.HS];
-        parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
         parts[counter++] = "IQ:\t";
         parts[counter++] = skills[player.IQ];
-        parts[counter++] = '</text><text x="10" y="220" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
         parts[counter++] = "Likes:\t";
         parts[counter++] = Strings.toString(player.likes);
-        parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
         parts[counter++] = "wins:\t";
         parts[counter++] = Strings.toString(player.wins);
-        parts[counter++] = '</text><text x="10" y="280" class="baseWhite">';
+        parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
         parts[counter++] = "burns:\t";
         parts[counter++] = Strings.toString(player.burns);
 
