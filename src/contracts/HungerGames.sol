@@ -34,7 +34,7 @@ contract HungerGames is Context {
         require(verse.owner() == _msgSender(), "caller is not the owner");
         _;
     }
-    function getPlayerInfo(uint256 tokenId) private returns (PlayerInfo memory) {
+    function getPlayerInfo(uint256 tokenId) private view returns (PlayerInfo memory) {
         PlayerInfo memory player;
         (player.state, player.gender, player.district, player.HS, player.IQ, player.likes, player.wins, player.burns) = verse.getPlayerInfo(tokenId);
         return player;

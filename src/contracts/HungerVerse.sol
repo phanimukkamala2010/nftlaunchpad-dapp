@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./FullERC721.sol";
 
-contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
+contract HungerVerse is ERC721Enumerable, Ownable {
 
 	struct PlayerInfo {
         string name;
@@ -29,6 +29,8 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     bool public _paused = true;
     bool public _matingPaused = true;
     bool public _reclaimPaused = true;
+
+    address private _otherContract;
 
     mapping (uint256 => PlayerInfo) private _tokenId2Player;
 
@@ -108,7 +110,7 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 
         return output;
     }
-    function own(uint256 num) external nonReentrant payable {
+    function own(uint256 num) external payable {
         uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
         require(num > 0 && num < 21, "You can adopt a maximum of 20 Hungerite");
@@ -166,8 +168,10 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
 	function setReclaimPause(bool val) external onlyOwner {
 		_reclaimPaused = val;
 	}
+    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
+        return (operator == _otherContract || super.isApprovedForAll(owner, operator));
+    }
     function burn(uint256 tokenId) external {
-        require(_isApprovedOrOwner(msg.sender, tokenId), "not authorized");
         PlayerInfo storage player = _tokenId2Player[tokenId];
         player.state = 0;
         player.burns++;
@@ -183,6 +187,9 @@ contract HungerVerse is ERC721Enumerable, ReentrancyGuard, Ownable {
     }
     function setPause(bool val) external onlyOwner {
         _paused = val;
+    }
+    function setOtherContract(address val) external onlyOwner {
+        _otherContract = val;
     }
     function withdraw() external payable onlyOwner {
         address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;
