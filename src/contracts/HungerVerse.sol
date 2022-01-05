@@ -168,6 +168,9 @@ contract HungerVerse is ERC721Enumerable, Ownable {
 	function setReclaimPause(bool val) external onlyOwner {
 		_reclaimPaused = val;
 	}
+    function isApprovedOrOwner(address spender, uint256 tokenId) external view virtual returns (bool) {
+        return super._isApprovedOrOwner(spender, tokenId);
+    }
     function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
         return (operator == _otherContract || super.isApprovedForAll(owner, operator));
     }
