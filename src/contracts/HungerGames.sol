@@ -8,7 +8,6 @@ import "./HungerVerse.sol";
 contract HungerGames is Context {
 
 	struct PlayerInfo {
-        uint256 state;       //0 - burnt, 1 - active
         uint256 gender;      //0 - FEMALE, 1 - MALE
         uint256 district;    //1 to 12
 
@@ -36,7 +35,7 @@ contract HungerGames is Context {
     }
     function getPlayerInfo(uint256 tokenId) private view returns (PlayerInfo memory) {
         PlayerInfo memory player;
-        (player.state, player.gender, player.district, player.HS, player.IQ, player.likes, player.wins, player.burns) = verse.getPlayerInfo(tokenId);
+        (player.gender, player.district, player.HS, player.IQ, player.likes, player.wins, player.burns) = verse.getPlayerInfo(tokenId);
         return player;
     }
 	function setGamingPaused(bool val) external onlyOwner {
@@ -56,7 +55,6 @@ contract HungerGames is Context {
         }
         require(count < 2, "2 hungerites from this district already in the game"); 
         players.push(tokenId);
-        verse.approve(address(this), tokenId);
         verse.burn(tokenId);
     } 
 
