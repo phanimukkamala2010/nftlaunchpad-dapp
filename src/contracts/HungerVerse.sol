@@ -24,7 +24,6 @@ contract HungerVerse is ERC721Enumerable, Ownable {
 	
     uint256 public _price = 0.05 ether;
     bool public _paused = false;
-    bool public _matingPaused = true;
 
     address public _otherContract;
 
@@ -124,7 +123,7 @@ contract HungerVerse is ERC721Enumerable, Ownable {
         }
     }
     function mate(uint256 tokenIdM, uint256 tokenIdF) external payable {
-        require(!_matingPaused, "Mating paused");
+        require(!_paused, "Sale paused");
         require(_isApprovedOrOwner(msg.sender, tokenIdM) && _isApprovedOrOwner(msg.sender, tokenIdF), "not authorized");
         require(_tokenId2Player[tokenIdM].gender == 1, "first token should be male");
         PlayerInfo storage female = _tokenId2Player[tokenIdF];
@@ -149,9 +148,6 @@ contract HungerVerse is ERC721Enumerable, Ownable {
         require(msg.sender == _otherContract, "not authorized");
 		_tokenId2Player[tokenId].wins++;
 	}
-	function setMatingPause(bool val) external onlyOwner {
-		_matingPaused = val;
-	}
     function isApprovedOrOwner(address spender, uint256 tokenId) external view virtual returns (bool) {
         return super._isApprovedOrOwner(spender, tokenId);
     }
@@ -172,7 +168,6 @@ contract HungerVerse is ERC721Enumerable, Ownable {
         _otherContract = val;
     }
     function withdraw() external payable onlyOwner {
-        address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;
-        require(payable(t1).send(address(this).balance));
+        payable(msg.sender).transfer(address(this).balance);
     }
 }

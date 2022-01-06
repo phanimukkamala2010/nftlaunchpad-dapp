@@ -59,7 +59,6 @@ contract HungerGames is Context {
     } 
 
     function withdrawFromGames() external payable onlyOwner {
-        address t1 = 0x4aF0BB035FfB1CbEFA550530917e151a53034d70;
-        require(payable(t1).send(address(this).balance));
+        payable(msg.sender).transfer(address(this).balance);
     }
 }
