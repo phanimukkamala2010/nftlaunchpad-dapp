@@ -23,10 +23,10 @@ contract HungerVerse is ERC721Enumerable, Ownable {
     string[] private skills = [ "Below Average", "Average", "Above Average", "Gifted" ];
 	
     uint256 public _price = 0.05 ether;
-    bool public _paused = true;
+    bool public _paused = false;
     bool public _matingPaused = true;
 
-    address private _otherContract;
+    address public _otherContract;
 
     mapping (uint256 => PlayerInfo) private _tokenId2Player;
 
@@ -36,22 +36,22 @@ contract HungerVerse is ERC721Enumerable, Ownable {
         PlayerInfo storage player = _tokenId2Player[tokenId];   //by reference
 
         player.gender = pluck(tokenId, "GENDER") % 2;
-        player.district = 1 + pluck(tokenId, "DISTRICT") % 12;
+        player.district = 1 + (player.wins + player.burns + pluck(tokenId, "DISTRICT")) % 12;
         if(player.gender == 0) {
-            player.offsprings = pluck(tokenId, "OFFSPRINGS") % 9;
+            player.offsprings = (player.wins + player.burns + pluck(tokenId, "OFFSPRINGS")) % 9;
         }
         player.HS = (player.wins + player.burns + pluck(tokenId, "HUNTING")) % 4;
         player.IQ = (player.wins + player.burns + pluck(tokenId, "IQSCORE")) % 4;
     }
     function getPlayerInfo(uint256 tokenId) external view returns (uint256,uint256,uint256,uint256,uint256,uint256,uint256) {
         PlayerInfo memory player = _tokenId2Player[tokenId];   //by reference
-            return (player.gender, 
-                            player.district, 
-                            player.HS, 
-                            player.IQ, 
-                            player.likes, 
-                            player.wins, 
-                            player.burns);
+        return (player.gender, 
+                        player.district, 
+                        player.HS, 
+                        player.IQ, 
+                        player.likes, 
+                        player.wins, 
+                        player.burns);
     }
     function random(string memory input) private pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
@@ -61,42 +61,44 @@ contract HungerVerse is ERC721Enumerable, Ownable {
     }
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
 
-        string memory output = "";
+        PlayerInfo memory player = _tokenId2Player[tokenId];
+
         string[32] memory parts;
 		uint256 counter = 0;
         parts[counter++] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">';
-		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 20px; }';
-		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 20px; }</style>';
+		parts[counter++] = '<style>.baseWhite { fill: white; font-family: serif; font-size: 16px; }';
+		parts[counter++] = '.baseGreen { fill: springgreen; font-family: serif; font-size: 16px; }</style>';
 		parts[counter++] = '<rect width="100%" height="100%" fill="black" />';
         parts[counter++] = '<text x="10" y="60" class="baseGreen">';
-        parts[counter++] = (_tokenId2Player[tokenId].gender == 0 ? "Female" : "Male");
+        parts[counter++] = (player.gender == 0 ? "Female" : "Male");
         parts[counter++] = '</text><text x="10" y="80" class="baseWhite">';
         parts[counter++] = "District:\t";
-        parts[counter++] = Strings.toString(_tokenId2Player[tokenId].district);
+        parts[counter++] = Strings.toString(player.district);
 
-        if(_tokenId2Player[tokenId].gender == 0) {
+        if(player.gender == 0) {
             parts[counter++] = '</text><text x="10" y="120" class="baseWhite">';
             parts[counter++] = "Offsprings:\t";
-            parts[counter++] = Strings.toString(_tokenId2Player[tokenId].offsprings);
+            parts[counter++] = Strings.toString(player.offsprings);
         }
         parts[counter++] = '</text><text x="10" y="160" class="baseWhite">';
         parts[counter++] = "HuntingSkills:\t";
-        parts[counter++] = skills[_tokenId2Player[tokenId].HS];
+        parts[counter++] = skills[player.HS];
         parts[counter++] = '</text><text x="10" y="180" class="baseWhite">';
         parts[counter++] = "IQ:\t";
-        parts[counter++] = skills[_tokenId2Player[tokenId].IQ];
+        parts[counter++] = skills[player.IQ];
         parts[counter++] = '</text><text x="10" y="200" class="baseWhite">';
         parts[counter++] = "Likes:\t";
-        parts[counter++] = Strings.toString(_tokenId2Player[tokenId].likes);
+        parts[counter++] = Strings.toString(player.likes);
         parts[counter++] = '</text><text x="10" y="240" class="baseWhite">';
-        parts[counter++] = "wins:\t";
-        parts[counter++] = Strings.toString(_tokenId2Player[tokenId].wins);
+        parts[counter++] = "Wins:\t";
+        parts[counter++] = Strings.toString(player.wins);
         parts[counter++] = '</text><text x="10" y="260" class="baseWhite">';
-        parts[counter++] = "burns:\t";
-        parts[counter++] = Strings.toString(_tokenId2Player[tokenId].burns);
+        parts[counter++] = "Burns:\t";
+        parts[counter++] = Strings.toString(player.burns);
 
         parts[counter++] = '</text></svg>';
 
+        string memory output = "";
 		for(uint256 i = 0; i < counter; ++i)
 		{
 			output = string(abi.encodePacked(output, parts[i]));
@@ -142,6 +144,10 @@ contract HungerVerse is ERC721Enumerable, Ownable {
     }
 	function like(uint256 tokenId) external {
 		_tokenId2Player[tokenId].likes++;
+	}
+	function win(uint256 tokenId) external {
+        require(msg.sender == _otherContract, "not authorized");
+		_tokenId2Player[tokenId].wins++;
 	}
 	function setMatingPause(bool val) external onlyOwner {
 		_matingPaused = val;

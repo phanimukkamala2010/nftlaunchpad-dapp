@@ -1,7 +1,5 @@
-const fcc = artifacts.require("FantasyCricketCoin");
-const match = artifacts.require("MatchFCC");
+const verse = artifacts.require("HungerVerse");
 
 module.exports = function(deployer) {
-  deployer.deploy(fcc);
-  deployer.deploy(match);
+  deployer.deploy(verse);
 };
