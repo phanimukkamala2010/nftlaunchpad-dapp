@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350">
+
+<!-- view box -->
+<path d="M 0 0 v 350 h 350 v -350 " style="fill: honeydew; stroke: grey; stroke-width: 0.5" />
+
+<!-- body -->
+<path d="M 105,0
+         v 30 h 1
+         v 30 h 1 
+         v 30 h 1
+         v 30 h 1
+         v 30 h 1
+         v 30 h 1
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         v 20 h -5
+         h 200
+         h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -20 h -5
+         v -30 h 1
+         v -30 h 1
+         v -30 h 1 
+         v -30 h 1
+         v -30 h 1
+         v -30 h 1
+         v -30
+         z"
+         style="fill:darksalmon;stroke:black;stroke-width:4" />
+<!-- bottom -->
+<path d="M 95,250
+         h 10 v 1
+         v 10 h 10
+         v 10 h 10
+         v 20 h 10
+         v 20 h 10
+         v 20 h 10
+         v 20 
+         h 20
+         v -20 h 10
+         v -20 h 10
+         v -20 h 10
+         v -20 h 10
+         v -10 h 10
+         v -10 h 10
+         v -1
+         z"
+         style="fill:red;stroke:black;stroke-width:4" />
+
+<!-- left top -->
+<path d="M 108,50
+         v -2 h 10
+         v -2 h 10
+         v -2 h 10
+         l 10 -45
+         l -10 45
+         v 2 h 10
+         v 2 h 10
+         h 20 h -20
+         v 20
+         v 20
+         h 20 h -20
+         v 2 h -5
+         v 2 h -10
+         v 2 h -10
+         v -2 h -10
+         v -2 h -10
+         v -2 h -5
+         z"
+         style="fill:red;stroke:black;stroke-width:4" />
+<!-- right top -->
+<path d="M 175,50
+         v -2 h 10
+         v -2 h 10
+         v -2 h 10
+         l -10 -45
+         l 10 45
+         v 2 h 10
+         v 2 h 10
+         v 20
+         v 20 
+         v 2 h -5
+         v 2 h -10
+         v 2 h -10
+         v -2 h -10
+         v -2 h -10
+         v -2 h -5
+         z"
+         style="fill:red;stroke:black;stroke-width:4" />
+
+<!-- circle -->
+<circle cx="165" cy="185" r="3"
+         style="fill:red;stroke:black;stroke-width:4" />
+
+</svg>
