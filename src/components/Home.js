@@ -12,7 +12,6 @@ class Home extends Component {
         await this.loadBlockchainData();
         await this.getPlayers();
         await this.runTimer();
-        await this.getPreviousSelectedPlayers();
     }
 
     async componentWillUnmount()    {
@@ -28,11 +27,6 @@ class Home extends Component {
 
         const match = await window.web3.eth.Contract(MatchFCC.abi, Constants.MATCH_ADDRESS);
         this.setState({match});
-    }
-
-    async callMint()    {
-        //console.log("In callMint");
-        await this.state.fcc.methods.mintCoin().send({from: this.state.account});
     }
 
     async callPlay()    {
@@ -64,34 +58,6 @@ class Home extends Component {
 
     async runTimer()  {
         //console.log("In runTimer");
-        await this.getBalance();
-        await this.getFccPaid();
-    }
-
-    async getBalance() {
-        const bal = await this.state.fcc.methods.balanceOf(this.state.account).call();
-        if(bal) {
-                this.setState({balance: bal.toString()});
-                //console.log("bal=" + bal.toString());
-        }
-    }
-
-    async getFccPaid() {
-        const owner = await this.state.fcc.methods.owner().call();
-        const blockNumber = await this.state.match.methods.getBlockNumber().call();
-        const account = this.state.account;
-        var paid = 0;
-        await this.state.fcc.getPastEvents('Transfer', { fromBlock: blockNumber }).then(function(events) { 
-            for(var i = 0; i < events.length; ++i) {
-                if(events[i].returnValues.from.toLowerCase() == account.toLowerCase() && 
-                   events[i].returnValues.to.toLowerCase() == owner.toLowerCase()) {
-                    paid += parseInt(events[i].returnValues.value);
-                    //console.log("filtered " + events[i].returnValues.from + "=>" + events[i].returnValues.to + " " + events[i].returnValues.value + "," + paid);
-                }
-            }
-        });
-        this.setState({fccPaid: paid});
-        //console.log("fccPaid=" + this.state.fccPaid);
     }
 
     async getPlayers()  {
@@ -120,28 +86,6 @@ class Home extends Component {
         }
         this.setState({selectedPlayersCost: cost});
         this.setState({selectedPlayersPoints: points});
-    }
-
-    async getPreviousSelectedPlayers()  {
-        var playerStr = await this.state.match.methods.getMatchPlayers().call({from: this.state.account});
-        if(playerStr == null || !playerStr.includes(':')) {
-            return;
-        }
-        playerStr = playerStr.replace(';', ':');
-        const playerArray = playerStr.split(":");
-        var cost = 0;
-        var points = 0;
-        for(var i = 0; i < 11; ++i) {
-            //console.log(playerArray[i]);
-            const playerName = await this.state.match.methods.getPlayer(playerArray[i]).call(); 
-            const playerCost = await this.state.match.methods.getCost(playerArray[i]).call();
-            cost += parseInt(playerCost.toString());
-            const playerPoints = await this.state.match.methods.getPoints(playerArray[i]).call();
-            points += parseInt(playerPoints.toString());
-            this.setState({ previousSelectedPlayers: this.state.previousSelectedPlayers.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
-        }
-        this.setState({previousSelectedPlayersCost: cost});
-        this.setState({previousSelectedPlayersPoints: points});
     }
 
     async onChange(event)  {
@@ -193,36 +137,19 @@ class Home extends Component {
                    );
         });
     }
-    renderPreviousSelectedPlayerTable()  {
-        return this.state.previousSelectedPlayers.map((player, index) => {
-            return (
-                   <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{player.name}</td>
-                    <td>{player.cost}</td>
-                    <td>{player.points}</td>
-                   </tr>
-                   );
-        });
-    }
 
     constructor(props) {
         super(props);
         this.state = {
             account: '',
             balance: 0,
-            fccPaid: 0,
             playerCount: 0,
             players: [],
             selectedPlayers: [],
             selectedPlayersCost: 0,
             selectedPlayersPoints: 0,
-            previousSelectedPlayers: [],
-            previousSelectedPlayersCost: 0,
-            previousSelectedPlayersPoints: 0,
             checkedPlayers: []
         };
-        this.callMint = this.callMint.bind(this);
         this.callPlay = this.callPlay.bind(this);
         this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
         this.getSelectedPlayersTotal = this.getSelectedPlayersTotal.bind(this);
@@ -236,51 +163,43 @@ class Home extends Component {
       <nav className="navbar navbar-expand-lg navbar-light bg-primary" >
         <div className="collapse navbar-collapse" id="navbarText">
             <ul className="navbar-nav mr-auto">
-                <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>FCC-Cricket</a> </li>
-                <li id="menuStyle" > <a className="text-white" href="/Results">Results</a> </li>
-                <li id="menuStyle" > <a className="text-white" href="/About">About</a> </li>
-                <li className="nav-item" >
-                { this.state.balance == 0 ?
-                    (<a className="text-white" id="menuStyle" href="javascript:void(0)" onClick={(event) => this.callMint()} >Mint</a>)
-                    :
-                    (<span />)
-                }
-                </li>
-                
+                <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>nft-launchpad.io</a> </li>
             </ul>
-            <span className="text-white" id="menuStyle" > {this.state.account} ({this.state.balance} FCC) </span>
+            <span className="text-white" id="menuStyle" > {this.state.account} </span>
         </div>
       </nav>
-      <div id="titleStyle" ><h4>10/Oct/2021,  Match - India vs NZ</h4></div>
+      <div id="titleStyle" ><h4>NFT Launch Pad</h4></div>
+      <div id="aboutStyle" >
+      Don't get lost on Opensea by having your collection. <p/>
+      Join the "NFT Launch Pad" collection on OpenSea and showcase your NFTs. <p/>
+      "NFT Launch Pad" collection is the one-stop shop for choosing NFTs from all budding artists.
+      </div>
+      <div id="titleStyle" ><h4>Step 1: Buy Token</h4></div>
       <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >PLAYERS AVAILABLE</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-                <th scope="col" >SELECT</th>
-            </tr>
-        </thead>
         <tbody className="playersStyle" >
-            {this.renderPlayerTable()}
+            <tr>
+                <td>Available Tokens</td>
+                <td>{this.state.selectedPlayersPoints}</td>
+            </tr>
+            <tr>
+                <td>Next Available Token</td>
+                <td>{this.state.selectedPlayersPoints}</td>
+            </tr>
+            <tr>
+                <td>Buy Token</td>
+                <td>{this.state.selectedPlayersPoints}</td>
+            </tr>
         </tbody>
       </table>
+      <div id="titleStyle" ><h4>Step 2: Select File and Set Description</h4></div>
       <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-            </tr>
-        </thead>
         <tbody className="playersStyle" >
-            {this.renderSelectedPlayerTable()}
             <tr>
-                <td>Total</td>
-                <td></td>
-                <td>{this.state.selectedPlayersCost}</td>
+                <td>File</td>
+                <td>{this.state.selectedPlayersPoints}</td>
+            </tr>
+            <tr>
+                <td>Description</td>
                 <td>{this.state.selectedPlayersPoints}</td>
             </tr>
         </tbody>
@@ -291,30 +210,7 @@ class Home extends Component {
           <td>
            <button type="submit" disabled={this.state.selectedPlayers.length != 11} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
           </td>
-          <td>
-           <button type="submit" disabled={this.state.fccPaid != 0} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callPlay() }>Play</button>
-          </td>
          </tr>
-        </tbody>
-      </table>
-      <div id="titleStyle" ><h3>Previous Selection</h3></div>
-      <table className="table" id="playersTable">
-        <thead>
-            <tr width="20%">
-                <th scope="col" >ID</th>
-                <th scope="col" >SELECTED PLAYERS (MAX 11)</th>
-                <th scope="col" >COST</th>
-                <th scope="col" >POINTS</th>
-            </tr>
-        </thead>
-        <tbody className="playersStyle" >
-            {this.renderPreviousSelectedPlayerTable()}
-            <tr>
-                <td>Total</td>
-                <td></td>
-                <td>{this.state.previousSelectedPlayersCost}</td>
-                <td>{this.state.previousSelectedPlayersPoints}</td>
-            </tr>
         </tbody>
       </table>
       </div>

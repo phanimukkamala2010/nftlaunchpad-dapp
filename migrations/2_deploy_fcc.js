@@ -1,5 +1,5 @@
-const verse = artifacts.require("HungerVerse");
+const pad = artifacts.require("NFTLaunchPad");
 
 module.exports = function(deployer) {
-  deployer.deploy(verse);
+  deployer.deploy(pad);
 };
