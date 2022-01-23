@@ -10,18 +10,16 @@ contract NFTLaunchPad is ERC721Enumerable, Ownable {
     uint256 public _price = 0.05 ether;
     bool public _paused = false;
 
-    mapping (uint256 => string) private _tokenId2tokenURI;
+    mapping (uint256 => string) private _tokenId2image;
+    mapping (uint256 => string) private _tokenId2desc;
 
     constructor() ERC721("NFTLaunchPad", "NFTLP") Ownable() {
 	}
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
-        string memory _tokenURI = _tokenId2tokenURI[tokenId];
-		string memory output = string(abi.encodePacked(_tokenURI));
-
-        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "MYON #', Strings.toString(tokenId), '", "description": "NFTLaunchPad lets you make your own NFT. Follow your imagination.", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
-        output = string(abi.encodePacked('data:application/json;base64,', json));
-
+        string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "NFTLP #', Strings.toString(tokenId), 
+                            '", "description": ', _tokenId2desc[tokenId], ' "image": ', _tokenId2image[tokenId], '"}'))));
+        string memory output = string(abi.encodePacked('data:application/json;base64,', json));
         return output;
     }
     function nextAvailableToken() external view returns (uint256) {
@@ -35,11 +33,14 @@ contract NFTLaunchPad is ERC721Enumerable, Ownable {
         require(totalSupply() < _maxSupply, "Exceeds maximum supply");
         require(msg.value >= _price, "Ether sent is not correct");
 
+        _tokenId2desc[tokenId] = "NFTLaunchPad lets you make your own NFT. Visit http://nftlaunchpad.io for more info";
         _safeMint(msg.sender, tokenId);
     }
-    function setTokenURI(uint256 tokenId, string memory _tokenURI) external {
+    function setTokenImage(uint256 tokenId, string memory _tokenImage, string memory _desc) external {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "not authorized");
-        _tokenId2tokenURI[tokenId] = _tokenURI;
+        _tokenId2image[tokenId] = _tokenImage;
+        if(bytes(_desc).length > 0)
+            _tokenId2desc[tokenId] = _desc;
     }
     function setMaxSupply(uint256 newVal) external onlyOwner {
         _maxSupply = newVal;
