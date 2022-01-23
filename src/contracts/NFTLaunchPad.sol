@@ -18,7 +18,7 @@ contract NFTLaunchPad is ERC721Enumerable, Ownable {
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "NFTLP #', Strings.toString(tokenId), 
-                            '", "description": ', _tokenId2desc[tokenId], ' "image": ', _tokenId2image[tokenId], '"}'))));
+                            '", "description": "', _tokenId2desc[tokenId], '", "image": "', _tokenId2image[tokenId], '"}'))));
         string memory output = string(abi.encodePacked('data:application/json;base64,', json));
         return output;
     }
