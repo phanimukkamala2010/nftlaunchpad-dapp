@@ -1,20 +1,76 @@
 import React, { Component } from 'react';
+import { create } from 'ipfs-http-client';
 import './App.css';
-import FantasyCricketCoin from '../abis/FantasyCricketCoin.json';
-import MatchFCC from '../abis/MatchFCC.json';
+import NFTLaunchpad from '../abis/NFTLaunchpad.json';
 import * as Constants from './Constants.js';
 import * as Common from './Common.js';
+
+const client = create('https://ipfs.infura.io:5001/api/v0')
 
 class Home extends Component {
 
     async componentWillMount()  {
         await Common.loadWeb3();
         await this.loadBlockchainData();
-        await this.getPlayers();
         await this.runTimer();
     }
 
-    async componentWillUnmount()    {
+    async handleFile(event) {
+        this.setState({fileURL: ''});
+        const fileURL = event.target.files[0];
+        if(fileURL.size > 30*1000*1000) {
+            alert("file size exceeds 30 MB");
+            return;
+        }
+        this.setState({fileURL});
+        //console.log(fileURL);
+    }
+    async handleDesc(event) {
+        this.setState({desc: ''});
+        const desc = event.target.value;
+        this.setState({desc});
+        //console.log(desc + "--" + this.state.selectedToken);
+    }
+
+    async onBuyToken(event) {
+        await this.nextAvailableToken();
+        var result = await this.state.nftlp.methods.mint(this.state.nextAvailableToken).send({from: this.state.account, value: 5*10**16});
+        //console.log("result: " + result.toString());
+    }
+
+    async onSubmit(event) {
+        const file = this.state.fileURL;
+        //console.log("file: " + file);
+        if(!file) {
+            alert("select a valid file");
+            return;
+        }
+        try {
+            const added = await client.add(file);
+            const fileURL = `https://ipfs.infura.io/ipfs/${added.path}`;
+            //console.log(fileURL);
+
+            var result = await this.state.nftlp.methods.setTokenImage(this.state.selectedToken, fileURL, this.state.desc).send({from: this.state.account});
+            //console.log("result: " + result.toString());
+        } catch (error) {
+            console.log('Error uploading file: ', error);
+        }  
+    }
+
+    async availableTokens() {
+        var supply = await this.state.nftlp.methods._maxSupply().call();
+        var used = await this.state.nftlp.methods.totalSupply().call();
+        this.setState({availableTokens: parseInt(supply) - parseInt(used)});
+    }
+
+    async nextAvailableToken() {
+        const token = await this.state.nftlp.methods.nextAvailableToken().call();
+        if(token) {
+            this.setState({nextAvailableToken: token.toString()});
+        }
+    }
+
+    async componentWillUnmount() {
         clearInterval(this.interval);
     }
 
@@ -22,138 +78,31 @@ class Home extends Component {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
 
-        const fcc = await window.web3.eth.Contract(FantasyCricketCoin.abi, Constants.FCC_ADDRESS);
-        this.setState({fcc});
-
-        const match = await window.web3.eth.Contract(MatchFCC.abi, Constants.MATCH_ADDRESS);
-        this.setState({match});
-    }
-
-    async callPlay()    {
-        const owner = await this.state.fcc.methods.owner().call();
-        //console.log("In callPlay " + owner + "-" + playerStr + "-" + cost);
-        await this.state.fcc.methods.transfer(owner, 1).send({from: this.state.account});
-    }
-
-    async callConfirmPlayers()    {
-        var playerstr = 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[0].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[1].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[2].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[3].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[4].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[5].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[6].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[7].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[8].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[9].name).call() + ":" + 
-                await this.state.match.methods.getPlayerIndex(this.state.selectedPlayers[10].name).call() + ";";
-        //console.log(playerstr);
-        this.state.match.methods.addMatchPlayers(playerstr).send({from: this.state.account}).on('transactionHash', function(hash) {
-            //console.log("hash-" + hash);
-        });
-
-        //console.log("In callPlay " + "-" + playerstr);
+        const nftlp = await window.web3.eth.Contract(NFTLaunchpad.abi, Constants.NFTLP_ADDRESS);
+        this.setState({nftlp});
     }
 
     async runTimer()  {
+        this.availableTokens();
+        this.nextAvailableToken();
         //console.log("In runTimer");
-    }
-
-    async getPlayers()  {
-        //console.log("In getPlayers");
-        const playerCount = await this.state.match.methods.getPlayerCount().call();
-        this.setState({playerCount});
-
-        for(var i = 0; i < playerCount; ++i)
-        {
-            const playerName = await this.state.match.methods.getPlayer(i).call(); 
-            const playerCost = await this.state.match.methods.getCost(i).call();
-            const playerPoints = await this.state.match.methods.getPoints(i).call();
-            //console.log("player=" + playerName + "," + playerCost);
-            this.setState({ players: this.state.players.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
-        }
-    }
-
-    async getSelectedPlayersTotal() {
-        var cost = 0;
-        var points = 0;
-        for(var i = 0; i < 22; ++i) {
-            if(this.state.checkedPlayers[i]) {
-                cost += parseInt(await this.state.match.methods.getCost(i).call());
-                points += parseInt(await this.state.match.methods.getPoints(i).call());
-            }
-        }
-        this.setState({selectedPlayersCost: cost});
-        this.setState({selectedPlayersPoints: points});
-    }
-
-    async onChange(event)  {
-        //console.log("called onChange " + id.index + " " + JSON.stringify(id) + " " + event.target.checked + " " + event.target.id);
-        const checked = event.target.checked;
-        const index = event.target.id;
-        this.state.checkedPlayers[event.target.id] = checked;
-        const playerName = await this.state.match.methods.getPlayer(index).call(); 
-        const playerCost = await this.state.match.methods.getCost(index).call();
-        const playerPoints = await this.state.match.methods.getPoints(index).call();
-        
-        this.setState({ selectedPlayers: this.state.selectedPlayers.filter( function(_player) {
-            return _player.name != playerName;
-        }) });
-        if(checked) {
-            this.setState({ selectedPlayers: this.state.selectedPlayers.concat({name: playerName, cost: playerCost.toString(), points: playerPoints.toString()}) });
-        }
-        this.getSelectedPlayersTotal();
-    }
-
-    renderPlayerTable()  {
-        const count = this.state.selectedPlayers.length;
-        return this.state.players.map((player, index) => {
-            const checked = this.state.checkedPlayers[index];
-            return (
-                   <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{player.name}</td>
-                    <td>{player.cost}</td>
-                    <td>{player.points}</td>
-                    <td>
-                     <div className="form-check">
-                      <input className="form-check-input" disabled={count >= 11 && !checked} type="checkbox" id={index} onChange={(event)=> this.onChange(event)}/>
-                     </div>
-                    </td>
-                   </tr>
-                   );
-        });
-    }
-    renderSelectedPlayerTable()  {
-        return this.state.selectedPlayers.map((player, index) => {
-            return (
-                   <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{player.name}</td>
-                    <td>{player.cost}</td>
-                    <td>{player.points}</td>
-                   </tr>
-                   );
-        });
     }
 
     constructor(props) {
         super(props);
         this.state = {
             account: '',
-            balance: 0,
-            playerCount: 0,
-            players: [],
-            selectedPlayers: [],
-            selectedPlayersCost: 0,
-            selectedPlayersPoints: 0,
-            checkedPlayers: []
+            fileURL: '',
+            availableTokens: 0,
+            nextAvailableToken: 0,
+            selectedToken: 0
         };
-        this.callPlay = this.callPlay.bind(this);
-        this.callConfirmPlayers = this.callConfirmPlayers.bind(this);
-        this.getSelectedPlayersTotal = this.getSelectedPlayersTotal.bind(this);
-        this.onChange = this.onChange.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
+        this.handleFile = this.handleFile.bind(this);
+        this.handleDesc = this.handleDesc.bind(this);
+        this.availableTokens = this.availableTokens.bind(this);
+        this.nextAvailableToken = this.nextAvailableToken.bind(this);
+        this.onBuyToken = this.onBuyToken.bind(this);
         this.interval = setInterval(() => this.runTimer(), 10000);
     }
 
@@ -168,51 +117,52 @@ class Home extends Component {
             <span className="text-white" id="menuStyle" > {this.state.account} </span>
         </div>
       </nav>
-      <div id="titleStyle" ><h4>NFT Launch Pad</h4></div>
+      <p/>
+      <div id="titleStyle" ><h4>NFT Launchpad</h4></div>
       <div id="aboutStyle" >
       Don't get lost on Opensea by having your collection. <p/>
-      Join the "NFT Launch Pad" collection on OpenSea and showcase your NFTs. <p/>
-      "NFT Launch Pad" collection is the one-stop shop for choosing NFTs from all budding artists.
+      Join the "NFT Launchpad" collection on OpenSea and showcase your NFTs. <p/>
+      "NFT Launchpad" collection is the one-stop shop for choosing NFTs from all budding artists.
       </div>
       <div id="titleStyle" ><h4>Step 1: Buy Token</h4></div>
+      <p/>
       <table className="table" id="playersTable">
-        <tbody className="playersStyle" >
+        <tbody>
             <tr>
                 <td>Available Tokens</td>
-                <td>{this.state.selectedPlayersPoints}</td>
+                <td>{this.state.availableTokens}</td>
             </tr>
             <tr>
                 <td>Next Available Token</td>
-                <td>{this.state.selectedPlayersPoints}</td>
-            </tr>
-            <tr>
-                <td>Buy Token</td>
-                <td>{this.state.selectedPlayersPoints}</td>
+                <td>{this.state.nextAvailableToken}</td>
             </tr>
         </tbody>
       </table>
-      <div id="titleStyle" ><h4>Step 2: Select File and Set Description</h4></div>
+      <div id="titleStyle"><button onClick={this.onBuyToken} >Buy Token</button></div>
+      <p/>
+      <div id="titleStyle" ><h4>Step 2: Set Your NFT Image File and Description</h4></div>
+      <p/>
       <table className="table" id="playersTable">
-        <tbody className="playersStyle" >
+        <tbody>
             <tr>
                 <td>File</td>
-                <td>{this.state.selectedPlayersPoints}</td>
+                <td><input type="file" id="nftFile" name="nftFile" accept="image/*,.mp4" onChange={this.handleFile}/></td>
             </tr>
             <tr>
                 <td>Description</td>
-                <td>{this.state.selectedPlayersPoints}</td>
+                <td><input type="text" size="50" onChange={this.handleDesc}/></td>
+            </tr>
+            <tr>
+                <td>Selected Token</td>
+                <td><input type="text" size="10" onChange={(event) => this.setState({selectedToken: event.target.value})}/></td>
             </tr>
         </tbody>
       </table>
-      <table className="table" id="buttonTable">
-        <tbody>
-         <tr>
-          <td>
-           <button type="submit" disabled={this.state.selectedPlayers.length != 11} id="buttonStyle" className="btn btn-outline-primary" onClick={(event) => this.callConfirmPlayers() }>Confirm Players</button>
-          </td>
-         </tr>
-        </tbody>
-      </table>
+      <div id="titleStyle"><button onClick={this.onSubmit} >Submit</button></div>
+      <p/>
+      <div id="titleStyle" >
+      <h4>Check Your NFT on Opensea at https://testnets.opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}</h4>
+      </div>
       </div>
     );
   }

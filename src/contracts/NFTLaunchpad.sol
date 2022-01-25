@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./FullERC721.sol";
 
-contract NFTLaunchPad is ERC721Enumerable, Ownable {
+contract NFTLaunchpad is ERC721Enumerable, Ownable {
 
     uint256 public _maxSupply = 10000;
     uint256 public _price = 0.05 ether;
@@ -13,7 +13,7 @@ contract NFTLaunchPad is ERC721Enumerable, Ownable {
     mapping (uint256 => string) private _tokenId2image;
     mapping (uint256 => string) private _tokenId2desc;
 
-    constructor() ERC721("NFTLaunchPad", "NFTLP") Ownable() {
+    constructor() ERC721("NFTLaunchpad", "NFTLP") Ownable() {
 	}
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
@@ -33,7 +33,7 @@ contract NFTLaunchPad is ERC721Enumerable, Ownable {
         require(totalSupply() < _maxSupply, "Exceeds maximum supply");
         require(msg.value >= _price, "Ether sent is not correct");
 
-        _tokenId2desc[tokenId] = "NFTLaunchPad lets you make your own NFT. Visit http://nftlaunchpad.io for more info";
+        _tokenId2desc[tokenId] = "NFTLaunchpad lets you make your own NFT. Visit http://nftlaunchpad.io for more info";
         _safeMint(msg.sender, tokenId);
     }
     function setTokenImage(uint256 tokenId, string memory _tokenImage, string memory _desc) external {
