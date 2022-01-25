@@ -34,7 +34,7 @@ class Home extends Component {
 
     async onBuyToken(event) {
         await this.nextAvailableToken();
-        var result = await this.state.nftlp.methods.mint(this.state.nextAvailableToken).send({from: this.state.account, value: 5*10**16});
+        await this.state.nftlp.methods.mint(this.state.nextAvailableToken).send({from: this.state.account, value: 5*10**16});
         //console.log("result: " + result.toString());
     }
 
@@ -50,7 +50,7 @@ class Home extends Component {
             const fileURL = `https://ipfs.infura.io/ipfs/${added.path}`;
             //console.log(fileURL);
 
-            var result = await this.state.nftlp.methods.setTokenImage(this.state.selectedToken, fileURL, this.state.desc).send({from: this.state.account});
+            await this.state.nftlp.methods.setTokenImage(this.state.selectedToken, fileURL, this.state.desc).send({from: this.state.account});
             //console.log("result: " + result.toString());
         } catch (error) {
             console.log('Error uploading file: ', error);
@@ -160,8 +160,8 @@ class Home extends Component {
       </table>
       <div id="titleStyle"><button onClick={this.onSubmit} >Submit</button></div>
       <p/>
-      <div id="titleStyle" >
-      <h4>Check Your NFT on Opensea at https://testnets.opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}</h4>
+      <div id="aboutStyle" >
+      Check your NFT on Opensea at https://testnets.opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}
       </div>
       </div>
     );
