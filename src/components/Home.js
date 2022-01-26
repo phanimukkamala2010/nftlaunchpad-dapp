@@ -140,13 +140,13 @@ class Home extends Component {
       </table>
       <div id="titleStyle"><button onClick={this.onBuyToken} >Buy Token</button></div>
       <p/>
-      <div id="titleStyle" ><h4>Step 2: Set Your NFT Image File and Description</h4></div>
+      <div id="titleStyle" ><h4>Step 2: Create your NFT with your Token</h4></div>
       <p/>
       <table className="table" id="playersTable">
         <tbody>
             <tr>
                 <td>File</td>
-                <td><input type="file" id="nftFile" name="nftFile" accept="image/*,.mp4" onChange={this.handleFile}/></td>
+                <td><input type="file" id="nftFile" name="nftFile" accept="image/*,video/*,audio/*" onChange={this.handleFile}/></td>
             </tr>
             <tr>
                 <td>Description</td>
@@ -161,7 +161,13 @@ class Home extends Component {
       <div id="titleStyle"><button onClick={this.onSubmit} >Submit</button></div>
       <p/>
       <div id="aboutStyle" >
-      Check your NFT on Opensea at https://testnets.opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}
+      Check your NFT on Opensea 
+      <p/>
+      <a href="https://opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}">
+      https://opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}
+      </a>
+      <p/>
+      twitter: <a href="https://twitter.com/srikumar_eth">@srikumar_eth</a>
       </div>
       </div>
     );
