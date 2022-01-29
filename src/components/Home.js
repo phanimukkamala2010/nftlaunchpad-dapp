@@ -120,9 +120,12 @@ class Home extends Component {
       <p/>
       <div id="titleStyle" ><h4>NFT Launchpad</h4></div>
       <div id="aboutStyle" >
-      Don't get lost on Opensea by having your collection. <p/>
-      Join the "NFT Launchpad" collection on OpenSea and showcase your NFTs. <p/>
-      "NFT Launchpad" collection is the one-stop shop for choosing NFTs from all budding artists.
+      Are your NFTs lost in Opensea? <p/>
+      <i>Creators</i>: Join the "NFT Launchpad" collection on OpenSea and showcase your NFTs. <p/>
+      <i>Collectors</i>: Checkout "NFT Launchpad" collection at {' '}
+      <a href="https://opensea.io/collection/nft-launchpad-io">
+      https://opensea.io/collection/nft-launchpad-io
+      </a>
       </div>
       <div id="titleStyle" ><h4>Step 1: Buy Token</h4></div>
       <p/>
@@ -160,14 +163,13 @@ class Home extends Component {
       </table>
       <div id="titleStyle"><button onClick={this.onSubmit} >Submit</button></div>
       <p/>
+      <div id="titleStyle" ><h4>Step 3: Refresh Metadata and Sell </h4></div>
       <div id="aboutStyle" >
-      Check your NFT on Opensea 
-      <p/>
-      <a href="https://opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}">
-      https://opensea.io/assets/{Constants.NFTLP_ADDRESS}/{this.state.selectedToken}
+      Check your NFT on Opensea at {' '}
+      <a href="https://opensea.io/collection/nft-launchpad-io">
+      https://opensea.io/collection/nft-launchpad-io
       </a>
-      <p/>
-      twitter: <a href="https://twitter.com/srikumar_eth">@srikumar_eth</a>
+      <div id="aboutStyle" ><p/>twitter: <a href="https://twitter.com/srikumar_eth">@srikumar_eth</a></div>
       </div>
       </div>
     );
