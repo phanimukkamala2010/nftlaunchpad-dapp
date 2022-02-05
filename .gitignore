@@ -10,6 +10,7 @@
 
 # production
 /build
+/public/cryptobabes
 
 # misc
 .DS_Store
