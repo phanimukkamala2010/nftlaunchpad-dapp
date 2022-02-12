@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 contract CryptoJackpot {
 
-    address private owner;
+    address public  owner;
     bool    public  _paused = false;
     uint256 public  _maxPlayers = 100;
     uint256 public  _price = 0.05 ether;
@@ -60,12 +60,13 @@ contract CryptoJackpot {
         payable(_tokenId2address[winnerTokenId]).transfer(_winnerPrice);
         emit Winner(_contestId, winnerTokenId);
         _coolPeriodStarted = true;
+        _winnerBlock = block.number;
     }
     function availableTokens() public view returns (string memory) {
         string memory str;
         for(uint256 i = 1; i <= _maxPlayers; ++i) {
             if(_tokenId2taken[i] == false) {
-                str = string(abi.encodePacked(str, (bytes(str).length > 0 ? "," : ""), i)); 
+                str = string(abi.encodePacked(str, (bytes(str).length > 0 ? "," : ""), toString(i))); 
             }
             if(bytes(str).length > 100) {
                 break;
@@ -90,5 +91,26 @@ contract CryptoJackpot {
     }
     function withdraw() external payable onlyOwner {
         payable(msg.sender).transfer(address(this).balance);
+    }
+    function toString(uint256 value) internal pure returns (string memory) {
+        // Inspired by OraclizeAPI's implementation - MIT licence
+        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
     }
 }
