@@ -32,7 +32,7 @@ contract CryptoPot {
     function joinContest(uint256 tokenId) external payable {
         require(msg.value >= _price, "Ether sent is not correct");
         require(tokenId > 0 && tokenId <= _maxPlayers, "token not valid");
-        require(tokenId2taken[tokenId] == false, "token not available");
+        require(_tokenId2taken[tokenId] == false, "token not available");
 
         if(_coolPeriodStarted) {  //new contest
             require(block.number - _winnerBlock > _coolPeriod, "cool period activated");
