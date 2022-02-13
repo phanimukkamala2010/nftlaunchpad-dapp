@@ -2,34 +2,34 @@
 
 pragma solidity ^0.8.0;
 
-contract CryptoJackpot {
+contract CryptoPot {
 
-    address public  owner;
-    bool    public  _paused = false;
-    uint256 public  _maxPlayers = 100;
-    uint256 public  _price = 0.05 ether;
-    uint256 public  _winnerPrice = 4.75 ether;
-    uint256 public  _contestId = 0;
-    uint256 public  _winnerBlock = 0;
-    uint256 public  _coolPeriod = 1000;  //1000 blocks 
-    bool    public  _coolPeriodStarted = false;
+    address public _creator;
+    address public _owner;
+    uint256 public _maxPlayers = 100;
+    uint256 public _price = 0.05 ether;
+    uint256 public _winnerPrice = 4.75 ether;
+    uint256 public _contestId = 0;
+    uint256 public _winnerBlock = 0;
+    uint256 public _coolPeriod = 1000;  //1000 blocks 
+    bool    public _coolPeriodStarted = false;
 
     mapping (uint256 => address) private _tokenId2address;
     mapping (uint256 => uint256) private _tokenId2block;
     mapping (uint256 => uint256) private _tokenId2time;
-    mapping (uint256 => bool) private _tokenId2taken; 
+    mapping (uint256 => bool)    private _tokenId2taken; 
 
     event Winner(uint256 contestId, uint256 tokenId);
 
     constructor() {
-        owner = msg.sender;
+        _owner = msg.sender;
+        _creator = msg.sender;
 	}
     modifier onlyOwner() {
-        require(msg.sender == owner, "Caller is not owner");
+        require(msg.sender == _owner, "Caller is not owner");
         _;
     }
     function joinContest(uint256 tokenId) external payable {
-        require(!_paused, "paused");
         require(msg.value >= _price, "Ether sent is not correct");
         require(tokenId > 0 && tokenId <= _maxPlayers, "token not valid");
 
@@ -43,7 +43,7 @@ contract CryptoJackpot {
         _tokenId2time[tokenId] = block.timestamp;
         _tokenId2taken[tokenId] = true;
         
-        if(bytes(availableTokens()).length == 0) {
+        if(availableTokensCount() == 0) {
             _contestId++;
             selectWinner();
         }
@@ -62,7 +62,16 @@ contract CryptoJackpot {
         _coolPeriodStarted = true;
         _winnerBlock = block.number;
     }
-    function availableTokens() public view returns (string memory) {
+    function availableTokensCount() public view returns (uint256) {
+        uint256 count = 0;
+        for(uint256 i = 1; i <= _maxPlayers; ++i) {
+            if(_tokenId2taken[i] == false) {
+                ++count;
+            }
+        }
+        return count;
+    }
+    function availableTokens() external view returns (string memory) {
         string memory str;
         for(uint256 i = 1; i <= _maxPlayers; ++i) {
             if(_tokenId2taken[i] == false) {
@@ -86,11 +95,12 @@ contract CryptoJackpot {
     function setWinnerPrice(uint256 _newVal) external onlyOwner {
         _winnerPrice = _newVal;
     }
-    function setPause(bool val) external onlyOwner {
-        _paused = val;
+    function withdraw() external payable {
+        require(_coolPeriodStarted == true, "game in progress");
+        payable(_creator).transfer(address(this).balance);
     }
-    function withdraw() external payable onlyOwner {
-        payable(msg.sender).transfer(address(this).balance);
+    function renounceOwnership() external onlyOwner {
+        _owner = address(0);
     }
     function toString(uint256 value) internal pure returns (string memory) {
         // Inspired by OraclizeAPI's implementation - MIT licence
