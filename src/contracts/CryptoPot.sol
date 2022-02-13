@@ -9,7 +9,7 @@ contract CryptoPot {
     uint256 public _maxPlayers = 100;
     uint256 public _price = 0.05 ether;
     uint256 public _winnerPrice = 4.75 ether;
-    uint256 public _contestId = 0;
+    uint256 public _contestId = 1;
     uint256 public _winnerBlock = 0;
     uint256 public _coolPeriod = 1000;  //1000 blocks 
     bool    public _coolPeriodStarted = false;
@@ -32,6 +32,7 @@ contract CryptoPot {
     function joinContest(uint256 tokenId) external payable {
         require(msg.value >= _price, "Ether sent is not correct");
         require(tokenId > 0 && tokenId <= _maxPlayers, "token not valid");
+        require(tokenId2taken[tokenId] == false, "token not available");
 
         if(_coolPeriodStarted) {  //new contest
             require(block.number - _winnerBlock > _coolPeriod, "cool period activated");
@@ -44,7 +45,6 @@ contract CryptoPot {
         _tokenId2taken[tokenId] = true;
         
         if(availableTokensCount() == 0) {
-            _contestId++;
             selectWinner();
         }
     } 
@@ -61,6 +61,7 @@ contract CryptoPot {
         emit Winner(_contestId, winnerTokenId);
         _coolPeriodStarted = true;
         _winnerBlock = block.number;
+        _contestId++;
     }
     function availableTokensCount() public view returns (uint256) {
         uint256 count = 0;
