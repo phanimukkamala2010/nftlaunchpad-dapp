@@ -113,6 +113,7 @@ class Home extends Component {
         <div className="collapse navbar-collapse" id="navbarText">
             <ul className="navbar-nav mr-auto">
                 <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>nft-launchpad.io</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/CryptoPot" >crypto-pot</a> </li>
             </ul>
             <span className="text-white" id="menuStyle" > {this.state.account} </span>
         </div>

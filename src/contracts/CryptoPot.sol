@@ -8,7 +8,7 @@ contract CryptoPot {
     address public _owner;
     uint256 public _maxPlayers = 100;
     uint256 public _price = 0.05 ether;
-    uint256 public _winnerPrice = 4.75 ether;
+    uint256 public _winnerPrice = 4.95 ether;
     uint256 public _contestId = 1;
     uint256 public _winnerBlock = 0;
     uint256 public _coolPeriod = 1000;  //1000 blocks 
@@ -24,7 +24,7 @@ contract CryptoPot {
     constructor() {
         _owner = msg.sender;
         _creator = msg.sender;
-	}
+    }
     modifier onlyOwner() {
         require(msg.sender == _owner, "Caller is not owner");
         _;
