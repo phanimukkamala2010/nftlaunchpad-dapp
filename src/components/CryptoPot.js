@@ -4,7 +4,7 @@ import CryptoPot from '../abis/CryptoPot.json';
 import * as Constants from './Constants.js';
 import * as Common from './Common.js';
 
-class Home extends Component {
+class CryptoPotJS extends Component {
 
     async componentWillMount()  {
         await Common.loadWeb3();
@@ -64,7 +64,7 @@ class Home extends Component {
       <nav className="navbar navbar-expand-lg navbar-light bg-primary" >
         <div className="collapse navbar-collapse" id="navbarText">
             <ul className="navbar-nav mr-auto">
-                <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>nft-launchpad.io</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/" >nft-launchpad.io</a> </li>
                 <li id="menuStyle" > <a className="text-white" href="/cryptopot" >crypto-pot</a> </li>
             </ul>
             <span className="text-white" id="menuStyle" > {this.state.account} </span>
@@ -82,10 +82,11 @@ class Home extends Component {
       <input type="text" size="10" onChange={(event) => this.setState({selectedToken: event.target.value})}/></div>
       <div id="titleStyle"><button onClick={this.onSubmit} >Submit</button></div>
       <p/>
+      <div id="aboutStyle" ><p/>contract: <a>{Constants.CPOT_ADDRESS}</a></div>
       <div id="aboutStyle" ><p/>twitter: <a href="https://twitter.com/srikumar_eth">@srikumar_eth</a></div>
       </div>
     );
   }
 }
 
-export default Home;
+export default CryptoPotJS;
