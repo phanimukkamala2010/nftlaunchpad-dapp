@@ -6,7 +6,7 @@ import "./FullERC721.sol";
 
 contract CryptoMfers is ERC721Enumerable, Ownable {
 
-    uint256 public _maxSupply = 12480;
+    uint256 public _maxSupply = 10000;
     uint256 public _price = 0.069 ether;
     bool public _paused = false;
     
