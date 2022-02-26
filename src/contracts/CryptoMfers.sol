@@ -20,16 +20,14 @@ contract CryptoMfers is ERC721Enumerable, Ownable {
         return _mferURI;
     }
     function mint(uint256 num) external payable {
+        uint256 supply = totalSupply();
         require(!_paused, "Sale paused");
-        require(num > 0 && num < 101, "maximum of 100 cryptomfers");
-        require(totalSupply() + num <= _maxSupply, "Exceeds maximum supply");
+        require(num < 101, "maximum of 100 cryptomfers");
+        require(supply + num <= _maxSupply, "Exceeds maximum supply");
         require(msg.value >= _price * num, "Ether sent is not correct");
 
-        uint256 count = 0;
-        for(uint256 i = 1; i <= _maxSupply; i++) {
-            if(_exists(i)) continue;
-            _safeMint(msg.sender, i);
-            if(++count == num) break;
+        for(uint256 i = 1; i <= num; i++) {
+            _safeMint(msg.sender, supply + i);
         }
     }
     function setMaxSupply(uint256 newVal) external onlyOwner {
