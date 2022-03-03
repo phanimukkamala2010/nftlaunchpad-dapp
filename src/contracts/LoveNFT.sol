@@ -17,13 +17,14 @@ contract LoveNFT is ERC721Enumerable, Ownable {
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "LoveNFT #', Strings.toString(tokenId), '", "description": "LoveNFT - NFT message for a loved one", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(_tokenId2tokenURI[tokenId])), '"}'))));
-        output = string(abi.encodePacked('data:application/json;base64,', json));
+        string memory output = string(abi.encodePacked('data:application/json;base64,', json));
 
         return output;
     }
-    function mint(uint256 tokenId, string memory loveURI) external payable {
+    function mint(string memory loveURI) external payable {
+        uint256 tokenId = totalSupply();
         require(!_paused, "Sale paused");
-        require(tokenId > 0 && tokenId <= _maxSupply, "Exceeds maximum supply");
+        require(tokenId <= _maxSupply, "Exceeds maximum supply");
         require(msg.value >= _price, "Ether sent is not correct");
 
         _tokenId2tokenURI[tokenId] = loveURI;

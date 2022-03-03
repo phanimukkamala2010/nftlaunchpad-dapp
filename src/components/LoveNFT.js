@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import CryptoPot from '../abis/CryptoPot.json';
+import LoveNFT from '../abis/LoveNFT.json';
 import * as Constants from './Constants.js';
 import * as Common from './Common.js';
 
@@ -37,7 +37,7 @@ class LoveNFTJS extends Component {
         svgStrFull = svgStrFull.replace("message2", this.state.message2);
         svgStrFull = svgStrFull.replace("message3", this.state.message3);
         svgStrFull = svgStrFull.replace("message4", this.state.message4);
-        await this.state.cpot.methods.joinContest(this.state.selectedToken).send({from: this.state.account, value: 5*10**16});
+        await this.state.lovenft.methods.mint(this.state.selectedToken).send({from: this.state.account, value: 5*10**16});
     }
 
     async componentWillUnmount() {
@@ -48,13 +48,13 @@ class LoveNFTJS extends Component {
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         this.setState({account: accounts[0]});
 
-        const cpot = await window.web3.eth.Contract(CryptoPot.abi, Constants.CPOT_ADDRESS);
-        this.setState({cpot});
+        const lovenft = await window.web3.eth.Contract(LoveNFT.abi, Constants.LOVENFT_ADDRESS);
+        this.setState({lovenft});
 
-        const priceWei = await this.state.cpot.methods._price().call();
+        const priceWei = await this.state.lovenft.methods._price().call();
         this.setState({price: window.web3.utils.fromWei(window.web3.utils.toBN(priceWei), "ether")});
 
-        const count = (await this.state.cpot.methods.availableTokensCount().call());
+        const count = (await this.state.lovenft.methods._maxSupply().call());
         this.setState({availableTokensCount: count.toString()});
     }
 
