@@ -114,6 +114,7 @@ class Home extends Component {
             <ul className="navbar-nav mr-auto">
                 <li id="menuStyle" > <a className="text-white" href="#" onClick={(event) => window.location.reload(false)}>nft-launchpad.io</a> </li>
                 <li id="menuStyle" > <a className="text-white" href="/CryptoPot" >crypto-pot</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/LoveNFT" >LoveNFT</a> </li>
             </ul>
             <span className="text-white" id="menuStyle" > {this.state.account} </span>
         </div>

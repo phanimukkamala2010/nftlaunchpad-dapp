@@ -66,6 +66,7 @@ class CryptoPotJS extends Component {
             <ul className="navbar-nav mr-auto">
                 <li id="menuStyle" > <a className="text-white" href="/" >nft-launchpad.io</a> </li>
                 <li id="menuStyle" > <a className="text-white" href="/cryptopot" >crypto-pot</a> </li>
+                <li id="menuStyle" > <a className="text-white" href="/lovenft" >LoveNFT</a> </li>
             </ul>
             <span className="text-white" id="menuStyle" > {this.state.account} </span>
         </div>
