@@ -22,7 +22,7 @@ contract LoveNFT is ERC721Enumerable, Ownable {
         return output;
     }
     function mint(string memory loveURI) external payable {
-        uint256 tokenId = totalSupply();
+        uint256 tokenId = totalSupply() + 1;
         require(!_paused, "Sale paused");
         require(tokenId <= _maxSupply, "Exceeds maximum supply");
         require(msg.value >= _price, "Ether sent is not correct");
