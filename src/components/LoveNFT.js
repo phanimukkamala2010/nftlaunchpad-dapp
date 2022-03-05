@@ -15,7 +15,11 @@ let svgStr8 = "<text x=\"30\" y=\"310\" style=\"fill:black;stroke:black;stroke-w
 let svgStr9 = "<text x=\"30\" y=\"320\" style=\"fill:black;stroke:black;stroke-width:0.1;font-size:10px\">message4 </text>";
 let svgStr10 = "<path d=\"M 340,327 v 7 h 1 v -5 z\" style=\"fill:silver;stroke:silver;stroke-width:1\" />";
 let svgStr11 = "<circle cx=\"340\" cy=\"341\" r=\"6\" style=\"fill:silver;stroke:silver;stroke-width:1\" />";
-let svgStr12 = "<text x=\"336\" y=\"342\" style=\"fill:gold;stroke:gold;stroke-width:0.5;font-size:5px\" >NFT</text></svg>";
+let svgStr12 = "<text x=\"336\" y=\"342\" style=\"fill:gold;stroke:gold;stroke-width:0.5;font-size:5px\" >NFT</text>";
+let svgStr13 = "<text x=\"2\" y=\"348\" style=\"fill:black;stroke:black;stroke-width:0.1;font-size:5px\" >todaydate</text></svg>";
+
+let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+let mapColors = new Map();
 
 class LoveNFTJS extends Component {
 
@@ -26,17 +30,22 @@ class LoveNFTJS extends Component {
     }
 
     async onSubmit(event) {
+        let year = new Date().getFullYear();
+        let month = new Date().getMonth();
+        let day = new Date().getDate();
+        let todayDate = day + "-" + months[month] + "-" + year;
+
         let svgStrFull = svgStr1.concat(svgStr2, svgStr3, svgStr4, svgStr5, svgStr6);
-        svgStrFull = svgStrFull.concat(svgStr7, svgStr8, svgStr9, svgStr10, svgStr11, svgStr12);
-        svgStrFull = svgStrFull.replace("bgColor", "pink");
-        svgStrFull = svgStrFull.replaceAll("heartColor", "red");
+        svgStrFull = svgStrFull.concat(svgStr7, svgStr8, svgStr9, svgStr10, svgStr11, svgStr12, svgStr13);
+        svgStrFull = svgStrFull.replace("bgColor", mapColors.get(this.state.heartColor));
+        svgStrFull = svgStrFull.replaceAll("heartColor", this.state.heartColor);
         svgStrFull = svgStrFull.replace("topName", this.state.topName);
         svgStrFull = svgStrFull.replace("bottomName", this.state.bottomName);
         svgStrFull = svgStrFull.replace("message1", this.state.message1);
         svgStrFull = svgStrFull.replace("message2", this.state.message2);
         svgStrFull = svgStrFull.replace("message3", this.state.message3);
         svgStrFull = svgStrFull.replace("message4", this.state.message4);
-        console.log(svgStrFull);
+        svgStrFull = svgStrFull.replace("todaydate", todayDate);
         await this.state.lovenft.methods.mint(svgStrFull.toString()).send({from: this.state.account, value: 69*10**15});
     }
 
@@ -54,8 +63,8 @@ class LoveNFTJS extends Component {
         const priceWei = await this.state.lovenft.methods._price().call();
         this.setState({price: window.web3.utils.fromWei(window.web3.utils.toBN(priceWei), "ether")});
 
-        const count = (await this.state.lovenft.methods._maxSupply().call());
-        this.setState({availableTokensCount: count.toString()});
+        const used = 1 + parseInt(await this.state.lovenft.methods.totalSupply().call());
+        this.setState({nextToken: used});
     }
 
     async runTimer()  {
@@ -67,7 +76,7 @@ class LoveNFTJS extends Component {
         this.state = {
             account: '',
             price: 0,
-            availableTokensCount: 0,
+            nextToken: 0,
             topName: '',
             bottomName: '',
             message1: '',
@@ -75,6 +84,8 @@ class LoveNFTJS extends Component {
             message3: '',
             message4: ''
         };
+        mapColors.set('blue', 'azure');
+        mapColors.set('red', 'pink');
         this.onSubmit = this.onSubmit.bind(this);
         this.interval = setInterval(() => this.runTimer(), 10000);
     }
@@ -95,32 +106,25 @@ class LoveNFTJS extends Component {
       <p/>
       <div id="titleStyle" ><h4>Love NFT</h4></div>
       <div id="aboutStyle" >
-      Create a love message NFT on blockchain. ({this.state.price} E) <p/>
+      Create a love message NFT on blockchain. ({this.state.price} E)
       </div>
-      <div id="aboutStyle"> Available Tokens ({this.state.availableTokensCount}) <p/>
+      <div id="aboutStyle"> Next Token ({this.state.nextToken}) <p/>
       </div>
       <table className="table" id="playersTable">
         <tbody>
             <tr>
-                <td>From Field (max 64)</td>
+                <td>Top Name (max 64)</td>
                 <td><input type="text" size="64" onChange={(event) => this.setState({topName: event.target.value})}/></td>
             </tr>
             <tr>
-                <td> To Field (max 64) </td>
+                <td>Bottom Name (max 64) </td>
                 <td><input type="text" size="64" onChange={(event) => this.setState({bottomName: event.target.value})}/></td>
             </tr>
             <tr>
-                <td> Love Color </td>
+                <td>Love Color </td>
                 <td className="select" onChange={(event) => this.setState({heartColor: event.target.value})}>
                 <select>
                     <option value="red">Red</option>
-                    <option value="yellow">Yellow</option>
-                    <option value="orange">Orange</option>
-                    <option value="green">Green</option>
-                    <option value="blue">Blue</option>
-                    <option value="purple">Purple</option>
-                    <option value="black">Black</option>
-                    <option value="white">White</option>
                 </select>
                 </td>
             </tr>
