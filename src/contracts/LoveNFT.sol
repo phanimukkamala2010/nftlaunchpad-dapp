@@ -10,10 +10,10 @@ contract LoveNFT is ERC721Enumerable, Ownable {
     uint256 public _price = 0.069 ether;
     bool public _paused = false;
 
-	mapping (uint256 => string) private _tokenId2tokenURI;
+    mapping (uint256 => string) private _tokenId2tokenURI;
     
     constructor() ERC721("LoveNFT", "LOVENFT") Ownable() {
-	}
+    }
 
     function tokenURI(uint256 tokenId) override public view returns (string memory) {
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "LoveNFT #', Strings.toString(tokenId), '", "description": "LoveNFT - NFT message for a loved one", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(_tokenId2tokenURI[tokenId])), '"}'))));
